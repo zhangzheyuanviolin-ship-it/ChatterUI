@@ -20,6 +20,9 @@ const ChatDrawerItem: React.FC<ChatDrawerItemProps> = ({ item, onLoad }) => {
     return (
         <View style={item.id === chatId ? styles.chatItemActive : styles.chatItem}>
             <TouchableOpacity
+                accessible
+                accessibilityRole="button"
+                accessibilityLabel={`Open chat ${item.name}`}
                 style={{ flex: 1, paddingHorizontal: spacing.xs, paddingVertical: spacing.m }}
                 onPress={() => onLoad(item.id)}>
                 <Text style={styles.title}>{item.name}</Text>

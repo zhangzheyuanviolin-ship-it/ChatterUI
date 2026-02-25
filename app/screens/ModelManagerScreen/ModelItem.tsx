@@ -126,6 +126,11 @@ const ModelItem: React.FC<ModelItemProps> = ({
             <View style={styles.buttonContainer}>
                 {!isMMPROJ && mmprojList.length > 0 && (
                     <TouchableOpacity
+                        accessible
+                        accessibilityRole="button"
+                        accessibilityLabel={
+                            item.mmprojLink ? 'Unlink vision model' : 'Link vision model'
+                        }
                         style={styles.button}
                         onPress={async () => {
                             if (item.mmprojLink) {
@@ -162,6 +167,9 @@ const ModelItem: React.FC<ModelItemProps> = ({
                 )}
                 <TouchableOpacity
                     disabled={disableEdit}
+                    accessible
+                    accessibilityRole="button"
+                    accessibilityLabel={`Rename model ${item.name}`}
                     style={styles.button}
                     onPress={() => {
                         setShowEdit(true)
@@ -174,6 +182,9 @@ const ModelItem: React.FC<ModelItemProps> = ({
                 </TouchableOpacity>
                 <TouchableOpacity
                     disabled={disableDelete}
+                    accessible
+                    accessibilityRole="button"
+                    accessibilityLabel={`Delete model ${item.name}`}
                     style={styles.button}
                     onPress={() => {
                         handleDeleteModel()
@@ -188,6 +199,9 @@ const ModelItem: React.FC<ModelItemProps> = ({
                 {!isMMPROJ && (
                     <TouchableOpacity
                         disabled={loadToggle}
+                        accessible
+                        accessibilityRole="button"
+                        accessibilityLabel={isLoaded ? `Unload model ${item.name}` : `Load model ${item.name}`}
                         style={styles.button}
                         onPress={async () => {
                             if (isLoaded) {

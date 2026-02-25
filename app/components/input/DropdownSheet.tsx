@@ -1,5 +1,6 @@
 import { Entypo } from '@expo/vector-icons'
 import { Theme } from '@lib/theme/ThemeManager'
+import { normalizeA11yLabel } from '@lib/utils/A11y'
 import { useState } from 'react'
 import { FlatList, Modal, Pressable, Text, View, ViewStyle, TextInput } from 'react-native'
 
@@ -73,6 +74,11 @@ const DropdownSheet = <T,>({
                                 keyExtractor={(item, index) => index.toString()}
                                 renderItem={({ item, index }) => (
                                     <Pressable
+                                        accessible
+                                        accessibilityRole="button"
+                                        accessibilityLabel={normalizeA11yLabel(
+                                            `Select ${labelExtractor(item)}`
+                                        )}
                                         style={
                                             selected &&
                                             labelExtractor(item) === labelExtractor(selected)
@@ -94,6 +100,8 @@ const DropdownSheet = <T,>({
                         )}
                         {search && (
                             <TextInput
+                                accessible
+                                accessibilityLabel={`${modalTitle} filter`}
                                 placeholder="Filter..."
                                 placeholderTextColor={theme.color.text._300}
                                 style={styles.searchBar}
@@ -104,7 +112,13 @@ const DropdownSheet = <T,>({
                     </View>
                 </KeyboardAvoidingView>
             </Modal>
-            <Pressable style={[style, styles.button]} onPress={() => setShowList(true)}>
+            <Pressable
+                accessible
+                accessibilityRole="button"
+                accessibilityLabel={normalizeA11yLabel(modalTitle)}
+                accessibilityHint="Opens selection list"
+                style={[style, styles.button]}
+                onPress={() => setShowList(true)}>
                 {selected && <Text style={styles.buttonText}>{labelExtractor(selected)}</Text>}
                 {!selected && <Text style={styles.placeholderText}>{placeholder}</Text>}
                 <Entypo name="chevron-down" color={theme.color.primary._800} size={18} />

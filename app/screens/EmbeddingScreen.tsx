@@ -52,12 +52,17 @@ const EmbeddingScreen = () => {
         <View style={{ margin: 8 }}>
             <Text>Embedding</Text>
             <TouchableOpacity
+                accessible
+                accessibilityRole="button"
+                accessibilityLabel="Load embedding model"
                 onPress={() => {
                     console.log('Reimplement if needed')
                 }}>
                 <Text style={{ color: color.text._100 }}>Load Model</Text>
             </TouchableOpacity>
             <TextInput
+                accessible
+                accessibilityLabel="Embedding input one"
                 value={t1}
                 onChangeText={sett1}
                 style={{
@@ -70,6 +75,8 @@ const EmbeddingScreen = () => {
                 }}
             />
             <TextInput
+                accessible
+                accessibilityLabel="Embedding input two"
                 value={t2}
                 onChangeText={sett2}
                 style={{
@@ -82,6 +89,9 @@ const EmbeddingScreen = () => {
                 }}
             />
             <TouchableOpacity
+                accessible
+                accessibilityRole="button"
+                accessibilityLabel="Test embedding similarity"
                 onPress={async () => {
                     const v1 = await getEmbed(t1)
                     const v2 = await getEmbed(t2)
@@ -99,6 +109,9 @@ const EmbeddingScreen = () => {
                 <Text style={{ color: color.text._100 }}>Test Embedding</Text>
             </TouchableOpacity>
             <TouchableOpacity
+                accessible
+                accessibilityRole="button"
+                accessibilityLabel="Clear embedding inputs"
                 onPress={async () => {
                     sett1('')
                     sett2('')
@@ -108,24 +121,36 @@ const EmbeddingScreen = () => {
             <Text style={{ color: color.text._100 }}>{output}</Text>
             <View style={{ margin: 16 }} />
             <TouchableOpacity
+                accessible
+                accessibilityRole="button"
+                accessibilityLabel="Delete embedding database"
                 onPress={async () => {
                     deleteTables()
                 }}>
                 <Text style={{ color: color.text._100 }}>Delete DB</Text>
             </TouchableOpacity>
             <TouchableOpacity
+                accessible
+                accessibilityRole="button"
+                accessibilityLabel="Create embedding database"
                 onPress={async () => {
                     createTables()
                 }}>
                 <Text style={{ color: color.text._100 }}>Make DB</Text>
             </TouchableOpacity>
             <TouchableOpacity
+                accessible
+                accessibilityRole="button"
+                accessibilityLabel="Insert sample embedding data"
                 onPress={async () => {
                     insertData()
                 }}>
                 <Text style={{ color: color.text._100 }}>Insert data</Text>
             </TouchableOpacity>
             <TouchableOpacity
+                accessible
+                accessibilityRole="button"
+                accessibilityLabel="Run embedding query"
                 onPress={async () => {
                     getData()
                 }}>

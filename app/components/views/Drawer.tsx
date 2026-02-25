@@ -1,6 +1,7 @@
 import ThemedButton, { ThemedButtonProps } from '@components/buttons/ThemedButton'
 import { AntDesign } from '@expo/vector-icons'
 import { Theme } from '@lib/theme/ThemeManager'
+import { normalizeA11yLabel } from '@lib/utils/A11y'
 import { useFocusEffect } from 'expo-router'
 import React, { ComponentProps, ReactNode, useCallback } from 'react'
 import { BackHandler, StyleSheet, View, ViewStyle } from 'react-native'
@@ -144,6 +145,10 @@ namespace Drawer {
                 }}
                 variant="tertiary"
                 iconName={show ? closeIcon : openIcon}
+                accessibilityLabel={normalizeA11yLabel(
+                    `${show ? 'Close' : 'Open'} ${drawerId} drawer`
+                )}
+                accessibilityHint="Toggles side panel"
                 {...rest}
             />
         )

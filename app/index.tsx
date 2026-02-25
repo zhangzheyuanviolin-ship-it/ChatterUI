@@ -78,7 +78,12 @@ const Home = () => {
                     color={color.text._500}
                 />
                 <Text style={styles.title}>Authentication Required</Text>
-                <TouchableOpacity onPress={retry} style={styles.button}>
+                <TouchableOpacity
+                    accessible
+                    accessibilityRole="button"
+                    accessibilityLabel="Retry authentication"
+                    onPress={retry}
+                    style={styles.button}>
                     <Text style={styles.buttonText}>Try Again</Text>
                 </TouchableOpacity>
             </View>

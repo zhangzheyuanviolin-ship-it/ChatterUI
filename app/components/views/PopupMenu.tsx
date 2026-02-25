@@ -1,5 +1,6 @@
 import { AntDesign } from '@expo/vector-icons'
 import { Theme } from '@lib/theme/ThemeManager'
+import { normalizeA11yLabel } from '@lib/utils/A11y'
 import { useFocusEffect } from 'expo-router'
 import React, { ReactNode, useRef, useState } from 'react'
 import {
@@ -61,7 +62,12 @@ const PopupOption: React.FC<PopupOptionProps> = ({
 
     return (
         <MenuOption>
-            <TouchableOpacity style={styles.popupButton} onPress={handleOnPress}>
+            <TouchableOpacity
+                accessible
+                accessibilityRole="button"
+                accessibilityLabel={normalizeA11yLabel(label) ?? 'Menu option'}
+                style={styles.popupButton}
+                onPress={handleOnPress}>
                 <AntDesign
                     style={{ minWidth: 20 }}
                     name={icon}
@@ -124,15 +130,21 @@ const PopupMenu: React.FC<PopupMenuProps> = ({
                 closeAnimationDuration: 0,
             }}>
             <MenuTrigger disabled={disabled}>
-                {icon && (
-                    <AntDesign
-                        style={style}
-                        color={showMenu ? color.text._500 : color.text._300}
-                        name={icon}
-                        size={iconSize}
-                    />
-                )}
-                {children}
+                <TouchableOpacity
+                    accessible
+                    accessibilityRole="button"
+                    accessibilityLabel="Open menu"
+                    disabled={disabled}>
+                    {icon && (
+                        <AntDesign
+                            style={style}
+                            color={showMenu ? color.text._500 : color.text._300}
+                            name={icon}
+                            size={iconSize}
+                        />
+                    )}
+                    {children}
+                </TouchableOpacity>
             </MenuTrigger>
             <MenuOptions customStyles={menuStyle}>
                 {options

@@ -16,6 +16,9 @@ const ChatDrawerSearchItem: React.FC<ChatDrawerSearchItemProps> = ({ item, onLoa
 
     return (
         <TouchableOpacity
+            accessible
+            accessibilityRole="button"
+            accessibilityLabel={`Jump to search result in chat ${item.chatName}`}
             onPress={() => onLoad(item.chatId, { type: 'entryId', value: item.chatEntryId })}
             style={{
                 paddingHorizontal: spacing.m,

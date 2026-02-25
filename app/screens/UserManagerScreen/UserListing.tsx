@@ -93,6 +93,9 @@ const UserListing: React.FC<CharacterListingProps> = ({ user }) => {
                 user.id === userId ? styles.longButtonSelectedContainer : styles.longButtonContainer
             }>
             <TouchableOpacity
+                accessible
+                accessibilityRole="button"
+                accessibilityLabel={`Switch to user ${user.name}`}
                 style={styles.longButton}
                 onPress={async () => {
                     await setCard(user.id)

@@ -1,5 +1,6 @@
 import TText from '@components/text/TText'
 import { AntDesign } from '@expo/vector-icons'
+import { firstDefined, normalizeA11yLabel } from '@lib/utils/A11y'
 import { Theme } from '@lib/theme/ThemeManager'
 import { ReactNode } from 'react'
 import {
@@ -139,9 +140,22 @@ const ThemedButton: React.FC<ThemedButtonProps> = ({
         }).start()
     }
 
+    const accessibilityLabel = firstDefined(
+        normalizeA11yLabel(rest.accessibilityLabel),
+        normalizeA11yLabel(label),
+        normalizeA11yLabel(iconName)
+    )
+
     return (
         <AnimatedPressable
             disabled={variant === 'disabled'}
+            accessible={rest.accessible ?? true}
+            accessibilityRole={rest.accessibilityRole ?? 'button'}
+            accessibilityState={{
+                ...rest.accessibilityState,
+                disabled: Boolean(variant === 'disabled' || rest.disabled),
+            }}
+            accessibilityLabel={accessibilityLabel}
             onPressIn={(event) => {
                 handlePressIn()
                 if (onPressIn) onPressIn(event)

@@ -1,6 +1,7 @@
 import ThemedButton from '@components/buttons/ThemedButton'
 import { FontAwesome } from '@expo/vector-icons'
 import { Theme } from '@lib/theme/ThemeManager'
+import { normalizeA11yLabel } from '@lib/utils/A11y'
 import { getStringAsync } from 'expo-clipboard'
 import { useState, useEffect } from 'react'
 import {
@@ -71,6 +72,9 @@ const TextBoxModal: React.FC<TextBoxModalProps> = ({
             animationType="fade">
             <TouchableOpacity
                 activeOpacity={1}
+                accessible
+                accessibilityRole="button"
+                accessibilityLabel="Close dialog"
                 onPress={handleOverlayClick}
                 style={{
                     flex: 1,
@@ -82,6 +86,8 @@ const TextBoxModal: React.FC<TextBoxModalProps> = ({
                     <View style={styles.inputContainer}>
                         <TextInput
                             autoFocus={autoFocus}
+                            accessible
+                            accessibilityLabel={`${normalizeA11yLabel(title) ?? 'Dialog'} input`}
                             style={styles.input}
                             value={text}
                             onChangeText={setText}
@@ -93,6 +99,9 @@ const TextBoxModal: React.FC<TextBoxModalProps> = ({
                         {showPaste && !text && (
                             <TouchableOpacity
                                 style={styles.inputButton}
+                                accessible
+                                accessibilityRole="button"
+                                accessibilityLabel="Paste text"
                                 onPress={async () => {
                                     setText(await getStringAsync())
                                 }}>

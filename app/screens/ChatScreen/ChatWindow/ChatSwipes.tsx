@@ -37,6 +37,9 @@ const ChatSwipes: React.FC<SwipesProps> = ({ nowGenerating, isGreeting, index })
     return (
         <View style={styles.swipesItem}>
             <TouchableOpacity
+                accessible
+                accessibilityRole="button"
+                accessibilityLabel="Previous swipe"
                 style={styles.swipeButton}
                 onPress={handleSwipeLeft}
                 disabled={nowGenerating || swipeIndex === 0}>
@@ -49,6 +52,9 @@ const ChatSwipes: React.FC<SwipesProps> = ({ nowGenerating, isGreeting, index })
 
             {index !== 0 && (
                 <TouchableOpacity
+                    accessible
+                    accessibilityRole="button"
+                    accessibilityLabel="Regenerate response"
                     onPress={() => swipeId && regenerateResponse(swipeId)}
                     onLongPress={() => swipeId && regenerateResponse(swipeId, false)}
                     disabled={nowGenerating}
@@ -67,6 +73,9 @@ const ChatSwipes: React.FC<SwipesProps> = ({ nowGenerating, isGreeting, index })
 
             {index !== 0 && (
                 <TouchableOpacity
+                    accessible
+                    accessibilityRole="button"
+                    accessibilityLabel="Continue response"
                     onPress={() => swipeId && continueResponse(swipeId)}
                     disabled={nowGenerating}
                     style={styles.swipeButton}>
@@ -79,6 +88,9 @@ const ChatSwipes: React.FC<SwipesProps> = ({ nowGenerating, isGreeting, index })
             )}
 
             <TouchableOpacity
+                accessible
+                accessibilityRole="button"
+                accessibilityLabel="Next swipe"
                 style={styles.swipeButton}
                 onPress={() => handleSwipeRight('')}
                 onLongPress={() => handleSwipeRight(swipeText ?? '')}

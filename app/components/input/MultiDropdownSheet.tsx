@@ -1,6 +1,7 @@
 import FadeBackrop from '@components/views/FadeBackdrop'
 import { Entypo } from '@expo/vector-icons'
 import { Theme } from '@lib/theme/ThemeManager'
+import { normalizeA11yLabel } from '@lib/utils/A11y'
 import { useState } from 'react'
 import {
     Modal,
@@ -25,6 +26,10 @@ const DropdownItem: React.FC<DropdownItemProps> = ({ label, active, onValueChang
     const styles = useDropdownStyles()
     return (
         <Pressable
+            accessible
+            accessibilityRole="checkbox"
+            accessibilityLabel={normalizeA11yLabel(label)}
+            accessibilityState={{ checked: active }}
             style={active ? styles.listItemSelected : styles.listItem}
             onPress={() => {
                 onValueChange(!active)
@@ -148,6 +153,8 @@ const MultiDropdownSheet = <T,>({
                         )}
                         {search && (
                             <TextInput
+                                accessible
+                                accessibilityLabel={`${modalTitle} filter`}
                                 placeholder="Filter..."
                                 placeholderTextColor={color.text._300}
                                 style={styles.searchBar}
@@ -158,7 +165,13 @@ const MultiDropdownSheet = <T,>({
                     </View>
                 </KeyboardAvoidingView>
             </Modal>
-            <Pressable style={[style, styles.button]} onPress={() => setShowList(true)}>
+            <Pressable
+                accessible
+                accessibilityRole="button"
+                accessibilityLabel={normalizeA11yLabel(modalTitle)}
+                accessibilityHint="Opens multi-select list"
+                style={[style, styles.button]}
+                onPress={() => setShowList(true)}>
                 {selected && selected.length > 0 && (
                     <Text style={styles.buttonText}>{selected.length} Items Selected</Text>
                 )}

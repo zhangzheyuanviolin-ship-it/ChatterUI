@@ -1,5 +1,6 @@
 import { Entypo } from '@expo/vector-icons'
 import { Theme } from '@lib/theme/ThemeManager'
+import { normalizeA11yLabel } from '@lib/utils/A11y'
 import React, { useState } from 'react'
 import { Pressable, Text, TextStyle, View, ViewProps, ViewStyle } from 'react-native'
 
@@ -24,6 +25,10 @@ const Accordion: React.FC<AccordionProps> = ({
     return (
         <View {...rest}>
             <Pressable
+                accessible
+                accessibilityRole="button"
+                accessibilityLabel={normalizeA11yLabel(label) ?? 'Accordion'}
+                accessibilityState={{ expanded: show }}
                 onPress={() => setShow(!show)}
                 style={{
                     backgroundColor: color.primary._300,
