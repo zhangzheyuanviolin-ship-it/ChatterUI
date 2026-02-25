@@ -11,21 +11,10 @@ on:
         options:
           - debug
           - release
-  push:
-    branches:
-      - master
-    paths:
-      - app/**
-      - lib/**
-      - db/**
-      - package.json
-      - package-lock.json
-      - app.config.js
-      - expo-build-plugins/**
-      - .github/workflows/android-apk-release.yml
 
 jobs:
   build-android:
+    timeout-minutes: 90
     runs-on: ubuntu-latest
     permissions:
       contents: write
@@ -62,13 +51,14 @@ jobs:
         run: npx expo prebuild --platform android
 
       - name: Build APK
+        timeout-minutes: 60
         run: |
           cd android
           chmod +x ./gradlew
           if [ "${{ github.event.inputs.build_type || 'debug' }}" = "release" ]; then
-            ./gradlew assembleRelease --no-daemon
+            ./gradlew :app:assembleRelease --no-daemon --stacktrace --info
           else
-            ./gradlew assembleDebug --no-daemon
+            ./gradlew :app:assembleDebug --no-daemon --stacktrace --info
           fi
 
       - name: Resolve artifact path
