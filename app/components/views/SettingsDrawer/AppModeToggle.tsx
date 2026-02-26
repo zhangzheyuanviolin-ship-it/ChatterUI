@@ -1,4 +1,5 @@
 import { AntDesign } from '@expo/vector-icons'
+import { t } from '@lib/i18n'
 import { useAppMode } from '@lib/state/AppMode'
 import { Theme } from '@lib/theme/ThemeManager'
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native'
@@ -12,7 +13,7 @@ const AppModeToggle = () => {
 
     return (
         <View style={styles.modeContainer}>
-            <Text style={styles.appModeText}>App Mode</Text>
+            <Text style={styles.appModeText}>{t('App Mode')}</Text>
             <View style={styles.modeButtonContainer}>
                 <TouchableOpacity
                     onPress={() => setAppMode('local')}
@@ -22,7 +23,9 @@ const AppModeToggle = () => {
                         color={localMode ? color.text._100 : color.text._500}
                         size={18}
                     />
-                    <Text style={localMode ? styles.modeText : styles.modeTextInactive}>Local</Text>
+                    <Text style={localMode ? styles.modeText : styles.modeTextInactive}>
+                        {t('Local')}
+                    </Text>
                 </TouchableOpacity>
                 <TouchableOpacity
                     onPress={() => setAppMode('remote')}
@@ -33,7 +36,7 @@ const AppModeToggle = () => {
                         size={18}
                     />
                     <Text style={remoteMode ? styles.modeText : styles.modeTextInactive}>
-                        Remote
+                        {t('Remote')}
                     </Text>
                 </TouchableOpacity>
             </View>

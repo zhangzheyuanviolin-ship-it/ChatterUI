@@ -1,6 +1,7 @@
 import ThemedButton from '@components/buttons/ThemedButton'
 import SectionTitle from '@components/text/SectionTitle'
 import Alert from '@components/views/Alert'
+import { t } from '@lib/i18n'
 import { useBackgroundStore } from '@lib/state/BackgroundImage'
 import { useRouter } from 'expo-router'
 import React from 'react'
@@ -20,31 +21,32 @@ const StyleSettings = () => {
 
     return (
         <View style={{ rowGap: 8 }}>
-            <SectionTitle>Style</SectionTitle>
+            <SectionTitle>{t('Style')}</SectionTitle>
 
             <ThemedButton
-                label="Change Theme"
+                label={t('Change Theme')}
                 variant="secondary"
                 onPress={() => router.push('/screens/AppSettingsScreen/ColorSelector')}
             />
             <ThemedButton
-                label={chatBackground ? 'Replace Chat Background' : 'Import Chat Background'}
+                label={t(chatBackground ? 'Replace Chat Background' : 'Import Chat Background')}
                 variant="secondary"
                 onPress={importBackground}
             />
             {chatBackground && (
                 <ThemedButton
-                    label="Delete Chat Background"
+                    label={t('Delete Chat Background')}
                     variant="critical"
                     onPress={() =>
                         Alert.alert({
-                            title: 'Delete Background',
-                            description:
-                                'Are you sure you want to delete this background? This cannot be undone!',
+                            title: t('Delete Background'),
+                            description: t(
+                                'Are you sure you want to delete this background? This cannot be undone!'
+                            ),
                             buttons: [
-                                { label: 'Cancel' },
+                                { label: t('Cancel') },
                                 {
-                                    label: 'Delete Background',
+                                    label: t('Delete Background'),
                                     type: 'warning',
                                     onPress: deleteBackground,
                                 },

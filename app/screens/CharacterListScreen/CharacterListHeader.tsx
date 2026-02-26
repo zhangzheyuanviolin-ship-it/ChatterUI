@@ -3,6 +3,7 @@ import StringArrayEditor from '@components/input/StringArrayEditor'
 import ThemedTextInput from '@components/input/ThemedTextInput'
 import { db } from '@db'
 import { AppSettings } from '@lib/constants/GlobalValues'
+import { t } from '@lib/i18n'
 import { CharacterSorter } from '@lib/state/CharacterSorter'
 import { TagHider } from '@lib/state/TagHider'
 import { Theme } from '@lib/theme/ThemeManager'
@@ -77,10 +78,10 @@ const CharacterListHeader: React.FC<CharacterListHeaderProps> = ({ resultLength 
                             color: color.text._400,
                             fontSize: 16,
                         }}>
-                        Sort By
+                        {t('Sort By')}
                     </Text>
-                    <SortButton type="modified" label="Recent" />
-                    <SortButton type="name" label="Name" />
+                    <SortButton type="modified" label={t('Recent')} />
+                    <SortButton type="name" label={t('Name')} />
                 </View>
                 <View
                     style={{
@@ -110,7 +111,11 @@ const CharacterListHeader: React.FC<CharacterListHeaderProps> = ({ resultLength 
                         delayLongPress={5000}
                         onLongPress={() => {
                             setUseTagHider(!useTagHider)
-                            Logger.infoToast('Hider ' + (!useTagHider ? 'Enabled' : 'Disabled'))
+                            Logger.infoToast(
+                                t('Hider {status}', {
+                                    status: t(!useTagHider ? 'Enabled' : 'Disabled'),
+                                })
+                            )
                         }}
                     />
                 </View>
@@ -128,10 +133,10 @@ const CharacterListHeader: React.FC<CharacterListHeaderProps> = ({ resultLength 
                                 suggestions={data
                                     .sort((a, b) => b.tagCount - a.tagCount)
                                     .map((item) => item.tag)}
-                                label="Tags"
+                                label={t('Tags')}
                                 value={tagFilter}
                                 setValue={setTagFilter}
-                                placeholder="Filter Tags..."
+                                placeholder={t('Filter Tags...')}
                                 filterOnly
                                 showSuggestionsOnEmpty
                             />
@@ -143,7 +148,7 @@ const CharacterListHeader: React.FC<CharacterListHeaderProps> = ({ resultLength 
                             style={{
                                 color: resultLength === 0 ? color.text._700 : color.text._100,
                             }}
-                            placeholder="Search Name..."
+                            placeholder={t('Search Name...')}
                         />
                         {(textFilter || tagFilter.length > 0) && (
                             <Text
@@ -151,7 +156,7 @@ const CharacterListHeader: React.FC<CharacterListHeaderProps> = ({ resultLength 
                                     marginTop: 8,
                                     color: color.text._400,
                                 }}>
-                                Results: {resultLength}
+                                {t('Results: {count}', { count: resultLength })}
                             </Text>
                         )}
                     </Animated.View>

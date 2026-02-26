@@ -1,6 +1,7 @@
 import Drawer from '@components/views/Drawer'
 import PopupMenu from '@components/views/PopupMenu'
 import { Ionicons } from '@expo/vector-icons'
+import { t } from '@lib/i18n'
 import { Theme } from '@lib/theme/ThemeManager'
 import { useRouter } from 'expo-router'
 import { StyleSheet } from 'react-native'
@@ -17,15 +18,15 @@ const ChatOptions = () => {
 
     return (
         <PopupMenu
-            triggerLabel="Chat actions"
-            triggerHint="Opens chat action menu"
+            triggerLabel={t('Chat actions')}
+            triggerHint={t('Opens chat action menu')}
             options={[
                 {
                     onPress: (m) => {
                         m.current?.close()
                         router.back()
                     },
-                    label: 'Main Menu',
+                    label: t('Main Menu'),
                     icon: 'back',
                 },
                 {
@@ -33,7 +34,7 @@ const ChatOptions = () => {
                         m.current?.close()
                         router.push('/screens/CharacterEditorScreen')
                     },
-                    label: 'Edit Character',
+                    label: t('Edit Character'),
                     icon: 'edit',
                 },
                 {
@@ -41,7 +42,7 @@ const ChatOptions = () => {
                         setShowChat(true)
                         m.current?.close()
                     },
-                    label: 'Chat History',
+                    label: t('Chat History'),
                     icon: 'paperclip',
                 },
             ]}

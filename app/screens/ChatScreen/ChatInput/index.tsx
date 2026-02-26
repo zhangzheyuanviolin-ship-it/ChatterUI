@@ -5,6 +5,7 @@ import { XAxisOnlyTransition } from '@lib/animations/transitions'
 import { AppSettings } from '@lib/constants/GlobalValues'
 import { generateResponse } from '@lib/engine/Inference'
 import { useUnfocusTextInput } from '@lib/hooks/UnfocusTextInput'
+import { t } from '@lib/i18n'
 import { Characters } from '@lib/state/Characters'
 import { Chats, useInference } from '@lib/state/Chat'
 import { Logger } from '@lib/state/Logger'
@@ -153,8 +154,10 @@ const ChatInput = () => {
                             <ThemedButton
                                 iconName="close"
                                 iconSize={20}
-                                accessibilityLabel={`Remove attachment ${item.name}`}
-                                accessibilityHint="Deletes this attachment from the message"
+                                accessibilityLabel={t('Remove attachment {name}', {
+                                    name: item.name,
+                                })}
+                                accessibilityHint={t('Deletes this attachment from the message')}
                                 buttonStyle={{
                                     borderWidth: 0,
                                     paddingHorizontal: 2,
@@ -186,11 +189,11 @@ const ChatInput = () => {
                             <PopupMenu
                                 icon="paperclip"
                                 iconSize={20}
-                                triggerLabel="Add attachment"
-                                triggerHint="Opens attachment options"
+                                triggerLabel={t('Add attachment')}
+                                triggerHint={t('Opens attachment options')}
                                 options={[
                                     {
-                                        label: 'Add Image',
+                                        label: t('Add Image'),
                                         icon: 'picture',
                                         onPress: async (menuRef) => {
                                             menuRef.current?.close()
@@ -231,8 +234,8 @@ const ChatInput = () => {
                         <Animated.View entering={FadeIn} exiting={FadeOut}>
                             <ThemedButton
                                 iconSize={18}
-                                accessibilityLabel="Show input options"
-                                accessibilityHint="Reveals chat input action buttons"
+                                accessibilityLabel={t('Show input options')}
+                                accessibilityHint={t('Reveals chat input action buttons')}
                                 iconStyle={{
                                     color: color.text._400,
                                 }}
@@ -253,8 +256,8 @@ const ChatInput = () => {
                     ref={inputRef}
                     accessible
                     accessibilityRole="text"
-                    accessibilityLabel="Message input"
-                    accessibilityHint="Double tap to type your message"
+                    accessibilityLabel={t('Message input')}
+                    accessibilityHint={t('Double tap to type your message')}
                     style={{
                         color: color.text._100,
                         backgroundColor: color.neutral._100,
@@ -269,7 +272,7 @@ const ChatInput = () => {
                         setHideOptions(!!newMessage)
                     }}
                     numberOfLines={6}
-                    placeholder="Message..."
+                    placeholder={t('Message...')}
                     placeholderTextColor={color.text._700}
                     value={newMessage}
                     onChangeText={(text) => {
@@ -284,11 +287,13 @@ const ChatInput = () => {
                     <TouchableOpacity
                         accessible
                         accessibilityRole="button"
-                        accessibilityLabel={nowGenerating ? 'Stop generation' : 'Send message'}
+                        accessibilityLabel={t(
+                            nowGenerating ? 'Stop generation' : 'Send message'
+                        )}
                         accessibilityHint={
                             nowGenerating
-                                ? 'Stops the current model response'
-                                : 'Sends your current message'
+                                ? t('Stops the current model response')
+                                : t('Sends your current message')
                         }
                         style={{
                             borderRadius: borderRadius.m,

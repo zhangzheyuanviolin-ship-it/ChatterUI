@@ -6,6 +6,7 @@ import HeaderTitle from '@components/views/HeaderTitle'
 import SettingsDrawer from '@components/views/SettingsDrawer'
 import { Characters } from '@lib/state/Characters'
 import { Chats } from '@lib/state/Chat'
+import { t } from '@lib/i18n'
 import ChatInput, { useInputHeightStore } from '@screens/ChatScreen/ChatInput'
 import ChatWindow from '@screens/ChatScreen/ChatWindow'
 import ChatsDrawer from '@screens/ChatScreen/ChatsDrawer'
@@ -79,8 +80,8 @@ const ChatMenu = () => {
                                         buttonStyle={{
                                             marginRight: 16,
                                         }}
-                                        accessibilityLabel="Start new chat"
-                                        accessibilityHint="Creates a new conversation"
+                                        accessibilityLabel={t('Start new chat')}
+                                        accessibilityHint={t('Creates a new conversation')}
                                         iconName="plus"
                                         variant="tertiary"
                                         iconSize={24}

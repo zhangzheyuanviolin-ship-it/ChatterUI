@@ -1,5 +1,6 @@
 import { AntDesign } from '@expo/vector-icons'
 import { AppSettings } from '@lib/constants/GlobalValues'
+import { t } from '@lib/i18n'
 import { useAppMode } from '@lib/state/AppMode'
 import { Theme } from '@lib/theme/ThemeManager'
 import { Href, useRouter } from 'expo-router'
@@ -34,7 +35,7 @@ const DrawerButton = ({ item, index }: DrawerButtonProps) => {
                     router.push(item.path)
                 }}>
                 <AntDesign size={24} name={item.icon ?? 'question'} color={color.text._400} />
-                <Text style={styles.largeButtonText}>{item.name}</Text>
+                <Text style={styles.largeButtonText}>{t(item.name)}</Text>
             </TouchableOpacity>
         </Animated.View>
     )

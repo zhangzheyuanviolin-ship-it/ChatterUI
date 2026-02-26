@@ -1,4 +1,5 @@
 import { FontAwesome } from '@expo/vector-icons'
+import { t } from '@lib/i18n'
 import { Theme } from '@lib/theme/ThemeManager'
 import React from 'react'
 import { Linking } from 'react-native'
@@ -14,7 +15,7 @@ const SupportButton = () => {
                 Linking.openURL('https://ko-fi.com/vali98')
             }}
             variant="secondary"
-            label="Support ChatterUI"
+            label={t('Support ChatterUI')}
             icon={<FontAwesome name="coffee" size={16} color={theme.color.primary._700} />}
         />
     )

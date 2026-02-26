@@ -1,4 +1,5 @@
 import HeaderTitle from '@components/views/HeaderTitle'
+import { t } from '@lib/i18n'
 import { Theme } from '@lib/theme/ThemeManager'
 import React from 'react'
 import { View } from 'react-native'
@@ -24,7 +25,7 @@ const AppSettingsMenu = () => {
                 paddingBottom: spacing.xl3,
             }}
             contentContainerStyle={{ rowGap: spacing.sm }}>
-            <HeaderTitle title="Settings" />
+            <HeaderTitle title={t('Settings')} />
 
             <StyleSettings />
             <ChatSettings />

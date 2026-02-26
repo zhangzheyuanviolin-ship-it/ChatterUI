@@ -1,6 +1,7 @@
 import ThemedButton from '@components/buttons/ThemedButton'
 import SectionTitle from '@components/text/SectionTitle'
 import Alert from '@components/views/Alert'
+import { t } from '@lib/i18n'
 import { Logger } from '@lib/state/Logger'
 import { Theme } from '@lib/theme/ThemeManager'
 import { localDownload } from '@vali98/react-native-fs'
@@ -16,38 +17,44 @@ const appVersion = appConfig.expo.version
 const exportDB = async (notify: boolean = true) => {
     await localDownload(`${documentDirectory}/SQLite/db.db`.replace('file://', ''))
         .then(() => {
-            if (notify) Logger.infoToast('Download Successful!')
+            if (notify) Logger.infoToast(t('Download Successful!'))
         })
-        .catch((e: string) => Logger.errorToast('Failed to copy database: ' + e))
+        .catch((e: string) => Logger.errorToast(t('Failed to copy database: {error}', { error: e })))
 }
 
 const importDB = async (uri: string, name: string) => {
     const copyDB = async () => {
         await exportDB(false)
         await deleteAsync(`${documentDirectory}SQLite/db.db`).catch(() => {
-            Logger.debug('Somehow the db is already deleted')
+            Logger.debug(t('Somehow the db is already deleted'))
         })
         await copyAsync({
             from: uri,
             to: `${documentDirectory}SQLite/db.db`,
         })
             .then(() => {
-                Logger.info('Copy Successful, Restarting now.')
+                Logger.info(t('Copy Successful, Restarting now.'))
                 reloadAppAsync()
             })
             .catch((e) => {
-                Logger.errorToast(`Failed to import database: ${e}`)
+                Logger.errorToast(t('Failed to import database: {error}', { error: e }))
             })
     }
 
     const dbAppVersion = name.split('-')?.[0]
     if (dbAppVersion !== appVersion) {
         Alert.alert({
-            title: `WARNING: Different Version`,
-            description: `The imported database file has a different app version (${dbAppVersion}) to installed version (${appVersion}).\n\nImporting this database may break or corrupt the database. It is recommended to use the same app version.`,
+            title: t('WARNING: Different Version'),
+            description: t(
+                'The imported database file has a different app version ({dbVersion}) to installed version ({appVersion}).\n\nImporting this database may break or corrupt the database. It is recommended to use the same app version.',
+                {
+                    dbVersion: dbAppVersion,
+                    appVersion,
+                }
+            ),
             buttons: [
-                { label: 'Cancel' },
-                { label: 'Import Anyways', onPress: copyDB, type: 'warning' },
+                { label: t('Cancel') },
+                { label: t('Import Anyways'), onPress: copyDB, type: 'warning' },
             ],
         })
     } else copyDB()
@@ -57,7 +64,7 @@ const DatabaseSettings = () => {
     const { color, spacing } = Theme.useTheme()
     return (
         <View style={{ rowGap: 8 }}>
-            <SectionTitle>Database Management</SectionTitle>
+            <SectionTitle>{t('Database Management')}</SectionTitle>
 
             <Text
                 style={{
@@ -65,36 +72,40 @@ const DatabaseSettings = () => {
                     paddingBottom: spacing.xs,
                     marginBottom: spacing.m,
                 }}>
-                WARNING: only import if you are certain it's from the same version!
+                {t("WARNING: only import if you are certain it's from the same version!")}
             </Text>
             <ThemedButton
-                label="Export Database"
+                label={t('Export Database')}
                 variant="secondary"
                 onPress={() => {
                     Alert.alert({
-                        title: `Export Database`,
-                        description: `Are you sure you want to export the database file?\n\nIt will automatically be downloaded to Downloads`,
+                        title: t('Export Database'),
+                        description: t(
+                            'Are you sure you want to export the database file?\n\nIt will automatically be downloaded to Downloads'
+                        ),
                         buttons: [
-                            { label: 'Cancel' },
-                            { label: 'Export Database', onPress: exportDB },
+                            { label: t('Cancel') },
+                            { label: t('Export Database'), onPress: exportDB },
                         ],
                     })
                 }}
             />
 
             <ThemedButton
-                label="Import Database"
+                label={t('Import Database')}
                 variant="secondary"
                 onPress={async () => {
                     getDocumentAsync({ type: ['application/*'] }).then(async (result) => {
                         if (result.canceled) return
                         Alert.alert({
-                            title: `Import Database`,
-                            description: `Are you sure you want to import this database? This may will destroy the current database!\n\nA backup will automatically be downloaded.\n\nApp will restart automatically`,
+                            title: t('Import Database'),
+                            description: t(
+                                'Are you sure you want to import this database? This may will destroy the current database!\n\nA backup will automatically be downloaded.\n\nApp will restart automatically'
+                            ),
                             buttons: [
-                                { label: 'Cancel' },
+                                { label: t('Cancel') },
                                 {
-                                    label: 'Import',
+                                    label: t('Import'),
                                     onPress: () =>
                                         importDB(result.assets[0].uri, result.assets[0].name),
                                     type: 'warning',

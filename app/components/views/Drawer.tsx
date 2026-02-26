@@ -1,5 +1,6 @@
 import ThemedButton, { ThemedButtonProps } from '@components/buttons/ThemedButton'
 import { AntDesign } from '@expo/vector-icons'
+import { t } from '@lib/i18n'
 import { Theme } from '@lib/theme/ThemeManager'
 import { normalizeA11yLabel } from '@lib/utils/A11y'
 import { useFocusEffect } from 'expo-router'
@@ -145,10 +146,8 @@ namespace Drawer {
                 }}
                 variant="tertiary"
                 iconName={show ? closeIcon : openIcon}
-                accessibilityLabel={normalizeA11yLabel(
-                    `${show ? 'Close' : 'Open'} ${drawerId} drawer`
-                )}
-                accessibilityHint="Toggles side panel"
+                accessibilityLabel={normalizeA11yLabel(getDrawerAccessibilityLabel(drawerId, show))}
+                accessibilityHint={t('Toggles side panel')}
                 {...rest}
             />
         )
@@ -202,6 +201,18 @@ namespace Drawer {
 }
 
 export default Drawer
+
+const getDrawerAccessibilityLabel = (drawerId: Drawer.ID, shown: boolean): string => {
+    if (drawerId === Drawer.ID.SETTINGS) {
+        return t(shown ? 'Close settings drawer' : 'Open settings drawer')
+    }
+
+    if (drawerId === Drawer.ID.CHATLIST) {
+        return t(shown ? 'Close chats drawer' : 'Open chats drawer')
+    }
+
+    return t(shown ? 'Close user list drawer' : 'Open user list drawer')
+}
 
 const useStyles = () => {
     const { color } = Theme.useTheme()
