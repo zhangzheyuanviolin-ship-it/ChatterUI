@@ -6,6 +6,7 @@ import ThemedButton from '@components/buttons/ThemedButton'
 import ThemedSwitch from '@components/input/ThemedSwitch'
 import Alert from '@components/views/Alert'
 import { APIManagerValue, APIManager } from '@lib/engine/API/APIManagerState'
+import { t } from '@lib/i18n'
 import { Theme } from '@lib/theme/ThemeManager'
 
 import ConnectionEditor from './ConnectionEditor'
@@ -28,12 +29,14 @@ const ConnectionItem: React.FC<ConnectionItemProps> = ({ item, index }) => {
 
     const handleDelete = () => {
         Alert.alert({
-            title: 'Delete API Entry',
-            description: `Are you sure you want to delete "${item.friendlyName}"?`,
+            title: t('Delete API Entry'),
+            description: t('Are you sure you want to delete "{name}"?', {
+                name: item.friendlyName,
+            }),
             buttons: [
-                { label: 'Cancel' },
+                { label: t('Cancel') },
                 {
-                    label: 'Delete API',
+                    label: t('Delete API'),
                     onPress: () => {
                         removeValue(index)
                     },
@@ -66,7 +69,7 @@ const ConnectionItem: React.FC<ConnectionItemProps> = ({ item, index }) => {
                         {item.friendlyName}
                     </Text>
                     <Text style={item.active ? styles.config : styles.configInactive}>
-                        Config: {item.configName}
+                        {t('Config')}: {item.configName}
                     </Text>
                 </View>
             </View>

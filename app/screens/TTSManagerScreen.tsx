@@ -10,6 +10,7 @@ import ThemedSwitch from '@components/input/ThemedSwitch'
 import ThemedTextInput from '@components/input/ThemedTextInput'
 import SectionTitle from '@components/text/SectionTitle'
 import HeaderTitle from '@components/views/HeaderTitle'
+import { t } from '@lib/i18n'
 import { Logger } from '@lib/state/Logger'
 import { useTTS } from '@lib/state/TTS'
 import { Theme } from '@lib/theme/ThemeManager'
@@ -26,7 +27,7 @@ const TTSManagerScreen = () => {
     const [lang, setLang] = useState(voice?.language ?? 'en-US')
     const [modelList, setModelList] = useState<Speech.Voice[]>([])
     const languageList: LanguageListItem = groupBy(modelList, 'language')
-    const [testAudioText, setTestAudioText] = useState('This is a test audio')
+    const [testAudioText, setTestAudioText] = useState(t('This is a test audio'))
 
     const languages = Object.keys(languageList)
         .sort()
@@ -51,7 +52,7 @@ const TTSManagerScreen = () => {
             }}
             contentContainerStyle={{ rowGap: 8 }}>
             <HeaderTitle title="TTS" />
-            <SectionTitle>Settings</SectionTitle>
+            <SectionTitle>{t('Settings')}</SectionTitle>
 
             <ThemedSwitch
                 label="Enable"
@@ -96,7 +97,7 @@ const TTSManagerScreen = () => {
             />
 
             <SectionTitle style={{ marginTop: 8 }}>
-                Language ({Object.keys(languageList).length})
+                {t('Language')} ({Object.keys(languageList).length})
             </SectionTitle>
             <View style={{ marginTop: 8 }}>
                 <View style={{ flexDirection: 'row', alignItems: 'center', columnGap: 8 }}>
@@ -105,7 +106,7 @@ const TTSManagerScreen = () => {
                         selected={lang}
                         data={languages}
                         labelExtractor={(item) => item}
-                        placeholder="Select Language"
+                        placeholder={t('Select Language')}
                         onChangeValue={(item) => setLang(item)}
                     />
                     <ThemedButton
@@ -118,17 +119,17 @@ const TTSManagerScreen = () => {
             </View>
 
             <SectionTitle style={{ marginTop: 8 }}>
-                Voices ({modelList.filter((item) => item.language === lang).length})
+                {t('Voices')} ({modelList.filter((item) => item.language === lang).length})
             </SectionTitle>
 
             <DropdownSheet
                 style={{ marginBottom: 8 }}
                 search
-                modalTitle="Select Voice"
+                modalTitle={t('Select Voice')}
                 selected={voice}
                 data={languageList?.[lang] ?? []}
                 labelExtractor={(item) => item.identifier}
-                placeholder="Select Voice"
+                placeholder={t('Select Voice')}
                 onChangeValue={(item) => setVoice(item)}
             />
             <View
@@ -148,7 +149,7 @@ const TTSManagerScreen = () => {
                     variant="secondary"
                     onPress={() => {
                         if (voice === undefined) {
-                            Logger.warnToast(`No Speaker Chosen`)
+                            Logger.warnToast(t('No Speaker Chosen'))
                             return
                         }
                         Speech.speak(testAudioText, {

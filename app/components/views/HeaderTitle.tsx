@@ -1,3 +1,4 @@
+import { t } from '@lib/i18n'
 import { Stack } from 'expo-router'
 import { ReactNode } from 'react'
 
@@ -7,10 +8,11 @@ type HeaderTitleProps = {
 }
 
 const HeaderTitle: React.FC<HeaderTitleProps> = ({ title = '', headerTitle = undefined }) => {
+    const translatedTitle = title ? t(title) : title
     return (
         <Stack.Screen
             options={{
-                title: title,
+                title: translatedTitle,
                 headerTitle: headerTitle,
                 animation: 'simple_push',
             }}
