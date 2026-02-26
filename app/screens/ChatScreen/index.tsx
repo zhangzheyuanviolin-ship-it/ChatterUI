@@ -79,6 +79,8 @@ const ChatMenu = () => {
                                         buttonStyle={{
                                             marginRight: 16,
                                         }}
+                                        accessibilityLabel="Start new chat"
+                                        accessibilityHint="Creates a new conversation"
                                         iconName="plus"
                                         variant="tertiary"
                                         iconSize={24}

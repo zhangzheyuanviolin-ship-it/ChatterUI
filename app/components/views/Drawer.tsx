@@ -140,7 +140,7 @@ namespace Drawer {
         return (
             <ThemedButton
                 iconSize={24}
-                onPressIn={() => {
+                onPress={() => {
                     setShow(drawerId, !show)
                 }}
                 variant="tertiary"

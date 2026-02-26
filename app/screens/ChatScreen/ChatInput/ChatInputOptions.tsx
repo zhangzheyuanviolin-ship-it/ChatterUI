@@ -17,6 +17,8 @@ const ChatOptions = () => {
 
     return (
         <PopupMenu
+            triggerLabel="Chat actions"
+            triggerHint="Opens chat action menu"
             options={[
                 {
                     onPress: (m) => {

@@ -40,6 +40,8 @@ type PopupMenuProps = {
     disabled?: boolean
     icon?: keyof typeof AntDesign.glyphMap
     iconSize?: number
+    triggerLabel?: string
+    triggerHint?: string
     style?: TextStyle
     options: MenuOptionProp[]
     placement?: 'top' | 'right' | 'bottom' | 'left' | 'auto'
@@ -86,6 +88,8 @@ const PopupMenu: React.FC<PopupMenuProps> = ({
     disabled,
     icon,
     iconSize = 26,
+    triggerLabel = 'Open menu',
+    triggerHint,
     style = {},
     menuCustomStyle = {},
     options,
@@ -133,8 +137,10 @@ const PopupMenu: React.FC<PopupMenuProps> = ({
                 <TouchableOpacity
                     accessible
                     accessibilityRole="button"
-                    accessibilityLabel="Open menu"
-                    disabled={disabled}>
+                    accessibilityLabel={normalizeA11yLabel(triggerLabel) ?? 'Open menu'}
+                    accessibilityHint={triggerHint}
+                    disabled={disabled}
+                    onPress={() => menuRef.current?.open()}>
                     {icon && (
                         <AntDesign
                             style={style}
