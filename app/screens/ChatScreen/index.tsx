@@ -110,6 +110,8 @@ const ChatScreen = () => {
                             buttonStyle={{
                                 marginRight: 16,
                             }}
+                            accessibilityLabel="Start new chat"
+                            accessibilityHint="Creates a new conversation"
                             iconName="plus"
                             variant="tertiary"
                             iconSize={24}
@@ -120,6 +122,8 @@ const ChatScreen = () => {
                             buttonStyle={{
                                 marginRight: 16,
                             }}
+                            accessibilityLabel="Import chat"
+                            accessibilityHint="Imports a chat from a JSON file"
                             iconName="upload"
                             variant="tertiary"
                             iconSize={20}
@@ -164,7 +168,6 @@ const ChatScreen = () => {
                         <ChatEditor />
                     </View>
                 </Animated.View>
-
                 {/**Drawer has to be outside of the KeyboardAvoidingView */}
                 <SettingsDrawer />
                 <ChatsDrawer />

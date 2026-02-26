@@ -18,6 +18,8 @@ const ChatOptions = () => {
 
     return (
         <ContextMenu
+            triggerLabel="Chat actions"
+            triggerHint="Opens chat action menu"
             buttons={[
                 {
                     onPress: (close) => {

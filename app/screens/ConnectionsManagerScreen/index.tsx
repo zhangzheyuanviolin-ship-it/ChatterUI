@@ -35,7 +35,10 @@ const ConnectionsManagerScreen = () => {
             <HeaderButton
                 headerRight={() => (
                     <Pressable
-                        onPressIn={() => {
+                        accessibilityRole="button"
+                        accessibilityLabel="Template manager"
+                        accessibilityHint="Opens API template list"
+                        onPress={() => {
                             router.push('/screens/ConnectionsManagerScreen/TemplateManager')
                         }}>
                         <AntDesign name="file" color={color.text._400} size={26} />

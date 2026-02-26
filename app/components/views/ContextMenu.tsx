@@ -33,6 +33,7 @@ import {
 } from '@lib/animations/transitions'
 import { useContextMenuStore } from '@lib/state/components/ContextMenu'
 import { Theme } from '@lib/theme/ThemeManager'
+import { normalizeA11yLabel } from '@lib/utils/A11y'
 
 import Portal from './Portal'
 
@@ -54,6 +55,8 @@ export interface ContextMenuProps extends ViewProps {
     triggerIcon?: keyof typeof AntDesign.glyphMap
     triggerIconSize?: number
     triggerStyle?: TextStyle
+    triggerLabel?: string
+    triggerHint?: string
     buttons: ContextMenuButtonProps[]
     placement?: Placement
     disabled?: boolean
@@ -73,6 +76,8 @@ const ContextMenu: React.FC<ContextMenuProps> = ({
     triggerIcon = 'question-circle',
     triggerIconSize = 26,
     triggerStyle,
+    triggerLabel,
+    triggerHint,
     disabled,
     onPress,
     onLongPress,
@@ -127,6 +132,14 @@ const ContextMenu: React.FC<ContextMenuProps> = ({
     return (
         <>
             <TouchableOpacity
+                accessible
+                accessibilityRole="button"
+                accessibilityLabel={
+                    normalizeA11yLabel(triggerLabel) ??
+                    normalizeA11yLabel(triggerIcon) ??
+                    'Open menu'
+                }
+                accessibilityHint={normalizeA11yLabel(triggerHint)}
                 activeOpacity={0.5}
                 style={{ opacity: isOpen ? 0.5 : 1 }}
                 ref={triggerRef}
@@ -323,6 +336,9 @@ const MenuList = ({
                     return (
                         <Animated.View key={key} layout={LinearTransition}>
                             <Pressable
+                                accessible
+                                accessibilityRole="button"
+                                accessibilityLabel={normalizeA11yLabel(item.label) ?? 'Menu option'}
                                 style={styles.menuItem}
                                 onPress={() => {
                                     if (hasSubmenu) {

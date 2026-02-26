@@ -179,6 +179,8 @@ const ChatInput = () => {
                             <ThemedButton
                                 iconName="close"
                                 iconSize={20}
+                                accessibilityLabel={`Remove attachment ${item.name}`}
+                                accessibilityHint="Deletes this attachment from the message"
                                 buttonStyle={{
                                     borderWidth: 0,
                                     paddingHorizontal: 2,
@@ -228,6 +230,8 @@ const ChatInput = () => {
                             }}>
                             <ChatOptions />
                             <ContextMenu
+                                triggerLabel="Add attachment"
+                                triggerHint="Opens attachment options"
                                 triggerIcon="paper-clip"
                                 triggerIconSize={20}
                                 buttons={[
@@ -262,6 +266,8 @@ const ChatInput = () => {
                         <Animated.View entering={FadeIn} exiting={FadeOut}>
                             <ThemedButton
                                 iconSize={18}
+                                accessibilityLabel="Show input options"
+                                accessibilityHint="Reveals chat input action buttons"
                                 iconStyle={{
                                     color: color.text._400,
                                 }}
@@ -280,6 +286,10 @@ const ChatInput = () => {
                 <AnimatedTextInput
                     layout={XAxisOnlyTransition}
                     ref={inputRef}
+                    accessible
+                    accessibilityRole="text"
+                    accessibilityLabel="Message input"
+                    accessibilityHint="Double tap to type your message"
                     style={{
                         color: color.text._100,
                         backgroundColor: color.neutral._100,
@@ -307,6 +317,14 @@ const ChatInput = () => {
                 />
                 <Animated.View layout={XAxisOnlyTransition}>
                     <TouchableOpacity
+                        accessible
+                        accessibilityRole="button"
+                        accessibilityLabel={nowGenerating ? 'Stop generation' : 'Send message'}
+                        accessibilityHint={
+                            nowGenerating
+                                ? 'Stops the current model response'
+                                : 'Sends your current message'
+                        }
                         style={{
                             borderRadius: borderRadius.m,
                             backgroundColor: nowGenerating ? color.error._500 : color.primary._500,
