@@ -11,6 +11,7 @@ import HeaderTitle from '@components/views/HeaderTitle'
 import PopupMenu from '@components/views/PopupMenu'
 import TextBoxModal from '@components/views/TextBoxModal'
 import { AppSettings } from '@lib/constants/GlobalValues'
+import { t } from '@lib/i18n'
 import useAutosave from '@lib/hooks/AutoSave'
 import { useTextFilterStore } from '@lib/hooks/TextFilter'
 import { MarkdownStyle } from '@lib/markdown/Markdown'
@@ -28,10 +29,10 @@ import { SafeAreaView } from 'react-native-safe-area-context'
 import { useShallow } from 'zustand/react/shallow'
 
 const autoformatterData = [
-    { label: 'Disabled', example: '*<No Formatting>*' },
-    { label: 'Plain Action, Quote Speech', example: 'Some action, "Some speech"' },
-    { label: 'Asterisk Action, Plain Speech', example: '*Some action* Some speech' },
-    { label: 'Asterisk Action, Quote Speech', example: '*Some action* "Some speech"' },
+    { label: t('Disabled'), example: '*<No Formatting>*' },
+    { label: t('Plain Action, Quote Speech'), example: 'Some action, "Some speech"' },
+    { label: t('Asterisk Action, Plain Speech'), example: '*Some action* Some speech' },
+    { label: t('Asterisk Action, Quote Speech'), example: '*Some action* "Some speech"' },
 ]
 
 const FormattingManager = () => {
@@ -66,12 +67,12 @@ const FormattingManager = () => {
 
     const handleRegenerateDefaults = () => {
         Alert.alert({
-            title: `Regenerate Default Instructs`,
-            description: `Are you sure you want to regenerate default Instructs'?`,
+            title: t('Regenerate Default Instructs'),
+            description: t("Are you sure you want to regenerate default Instructs'?"),
             buttons: [
-                { label: 'Cancel' },
+                { label: t('Cancel') },
                 {
-                    label: 'Regenerate Default Presets',
+                    label: t('Regenerate Default Presets'),
                     onPress: async () => {
                         await Instructs.generateInitialDefaults()
                     },
@@ -84,27 +85,29 @@ const FormattingManager = () => {
         if (!instructID) return
         const name = (currentInstruct?.name ?? 'Default') + '.json'
         await saveStringToDownload(JSON.stringify(currentInstruct), name, 'utf8')
-        Logger.infoToast(`Saved "${name}" to Downloads`)
+        Logger.infoToast(t('Saved "{name}" to Downloads', { name }))
     }
 
     const handleDeletePreset = () => {
         if (instructList.length === 1) {
-            Logger.warnToast(`Cannot delete last Instruct preset.`)
+            Logger.warnToast(t('Cannot delete last Instruct preset.'))
             return
         }
 
         Alert.alert({
-            title: `Delete Config`,
-            description: `Are you sure you want to delete '${currentInstruct?.name}'?`,
+            title: t('Delete Config'),
+            description: t("Are you sure you want to delete '{name}'?", {
+                name: currentInstruct?.name ?? '',
+            }),
             buttons: [
-                { label: 'Cancel' },
+                { label: t('Cancel') },
                 {
-                    label: 'Delete Instruct',
+                    label: t('Delete Instruct'),
                     onPress: async () => {
                         if (!instructID) return
                         const leftover = data.filter((item) => item.id !== instructID)
                         if (leftover.length === 0) {
-                            Logger.warnToast('Cannot delete last instruct')
+                            Logger.warnToast(t('Cannot delete last instruct'))
                             return
                         }
                         Instructs.db.mutate.deleteInstruct(instructID)
@@ -123,7 +126,7 @@ const FormattingManager = () => {
             placement="bottom"
             options={[
                 {
-                    label: 'Create Config',
+                    label: t('Create Config'),
                     icon: 'addfile',
                     onPress: (menu) => {
                         setShowNewInstruct(true)
@@ -132,7 +135,7 @@ const FormattingManager = () => {
                     },
                 },
                 {
-                    label: 'Export Config',
+                    label: t('Export Config'),
                     icon: 'download',
                     onPress: (menu) => {
                         handleExportPreset()
@@ -140,7 +143,7 @@ const FormattingManager = () => {
                     },
                 },
                 {
-                    label: 'Delete Config',
+                    label: t('Delete Config'),
                     icon: 'delete',
                     onPress: (menu) => {
                         handleDeletePreset()
@@ -149,7 +152,7 @@ const FormattingManager = () => {
                     warning: true,
                 },
                 {
-                    label: 'Regenerate Default',
+                    label: t('Regenerate Default'),
                     icon: 'reload1',
                     onPress: (menu) => {
                         handleRegenerateDefaults()
@@ -171,14 +174,14 @@ const FormattingManager = () => {
                     marginVertical: spacing.xl,
                     flex: 1,
                 }}>
-                <HeaderTitle title="Formatting" />
+                <HeaderTitle title={t('Formatting')} />
                 <HeaderButton headerRight={headerRight} />
                 <View>
                     <TextBoxModal
                         booleans={[showNewInstruct, setShowNewInstruct]}
                         onConfirm={(text) => {
                             if (instructList.some((item) => item.name === text)) {
-                                Logger.warnToast(`Config name already exists.`)
+                                Logger.warnToast(t('Config name already exists.'))
                                 return
                             }
                             if (!currentInstruct) return
@@ -186,7 +189,7 @@ const FormattingManager = () => {
                             Instructs.db.mutate
                                 .createInstruct({ ...currentInstruct, name: text })
                                 .then(async (newid) => {
-                                    Logger.infoToast(`Config created.`)
+                                    Logger.infoToast(t('Config created.'))
                                     await loadInstruct(newid)
                                 })
                         }}
@@ -518,7 +521,7 @@ const FormattingManager = () => {
                             style={{
                                 color: color.text._400,
                             }}>
-                            Automatically formats first message to the style below:
+                            {t('Automatically formats first message to the style below:')}
                         </Text>
                         <View
                             style={{
@@ -558,7 +561,7 @@ const FormattingManager = () => {
                         style={{
                             color: color.text._400,
                         }}>
-                        Hides text that matches regex patterns defined below. (case insensitive)
+                        {t('Hides text that matches regex patterns defined below. (case insensitive)')}
                     </Text>
 
                     <StringArrayEditor value={textFilter} setValue={setTextFilter} />

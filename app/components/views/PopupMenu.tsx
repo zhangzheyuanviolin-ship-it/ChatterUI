@@ -1,4 +1,5 @@
 import { AntDesign } from '@expo/vector-icons'
+import { t } from '@lib/i18n'
 import { Theme } from '@lib/theme/ThemeManager'
 import { normalizeA11yLabel } from '@lib/utils/A11y'
 import { useFocusEffect } from 'expo-router'
@@ -61,13 +62,14 @@ const PopupOption: React.FC<PopupOptionProps> = ({
     const handleOnPress = async () => {
         await onPress(menuRef)
     }
+    const translatedLabel = t(label)
 
     return (
         <MenuOption>
             <TouchableOpacity
                 accessible
                 accessibilityRole="button"
-                accessibilityLabel={normalizeA11yLabel(label) ?? 'Menu option'}
+                accessibilityLabel={normalizeA11yLabel(translatedLabel) ?? t('Menu option')}
                 style={styles.popupButton}
                 onPress={handleOnPress}>
                 <AntDesign
@@ -77,7 +79,7 @@ const PopupOption: React.FC<PopupOptionProps> = ({
                     color={warning ? color.error._300 : color.text._100}
                 />
                 <Text style={warning ? styles.optionLabelWarning : styles.optionLabel}>
-                    {label}
+                    {translatedLabel}
                 </Text>
             </TouchableOpacity>
         </MenuOption>
@@ -99,6 +101,8 @@ const PopupMenu: React.FC<PopupMenuProps> = ({
     const styles = useStyles()
     const { color } = Theme.useTheme()
     const menuStyle = useMenuStyle()
+    const translatedTriggerLabel = t(triggerLabel)
+    const translatedTriggerHint = triggerHint ? t(triggerHint) : undefined
     const [showMenu, setShowMenu] = useState<boolean>(false)
     const menuRef: MenuRef = useRef(null)
 
@@ -137,8 +141,8 @@ const PopupMenu: React.FC<PopupMenuProps> = ({
                 <TouchableOpacity
                     accessible
                     accessibilityRole="button"
-                    accessibilityLabel={normalizeA11yLabel(triggerLabel) ?? 'Open menu'}
-                    accessibilityHint={triggerHint}
+                    accessibilityLabel={normalizeA11yLabel(translatedTriggerLabel) ?? t('Open menu')}
+                    accessibilityHint={translatedTriggerHint}
                     disabled={disabled}
                     onPress={() => menuRef.current?.open()}>
                     {icon && (
@@ -155,8 +159,8 @@ const PopupMenu: React.FC<PopupMenuProps> = ({
             <MenuOptions customStyles={menuStyle}>
                 {options
                     .filter((item) => !item.disabled)
-                    .map((item) => (
-                        <PopupOption {...item} key={item.label} menuRef={menuRef} />
+                    .map((item, index) => (
+                        <PopupOption {...item} key={`${item.label}-${index}`} menuRef={menuRef} />
                     ))}
             </MenuOptions>
         </Menu>

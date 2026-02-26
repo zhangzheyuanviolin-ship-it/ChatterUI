@@ -1,4 +1,5 @@
 import { AntDesign } from '@expo/vector-icons'
+import { t } from '@lib/i18n'
 import { Theme } from '@lib/theme/ThemeManager'
 import { Text, View } from 'react-native'
 
@@ -19,7 +20,7 @@ const ModelEmpty = () => {
                     fontStyle: 'italic',
                     fontSize: fontSize.l,
                 }}>
-                No Models Found. Try Importing Some!
+                {t('No Models Found. Try Importing Some!')}
             </Text>
         </View>
     )

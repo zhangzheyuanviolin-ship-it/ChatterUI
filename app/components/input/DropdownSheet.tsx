@@ -1,4 +1,5 @@
 import { Entypo } from '@expo/vector-icons'
+import { t } from '@lib/i18n'
 import { Theme } from '@lib/theme/ThemeManager'
 import { normalizeA11yLabel } from '@lib/utils/A11y'
 import { useState } from 'react'
@@ -44,6 +45,8 @@ const DropdownSheet = <T,>({
     const items = data.filter((item) =>
         labelExtractor(item).toLowerCase().includes(searchFilter.toLowerCase())
     )
+    const translatedTitle = t(modalTitle)
+    const translatedPlaceholder = t(placeholder)
     return (
         <View style={containerStyle}>
             <Modal
@@ -65,7 +68,7 @@ const DropdownSheet = <T,>({
                     />
                     <View style={{ flex: 1 }} />
                     <View style={styles.listContainer}>
-                        <Text style={styles.modalTitle}>{modalTitle}</Text>
+                        <Text style={styles.modalTitle}>{translatedTitle}</Text>
                         {items.length > 0 ? (
                             <FlatList
                                 contentContainerStyle={{ rowGap: 2 }}
@@ -77,7 +80,7 @@ const DropdownSheet = <T,>({
                                         accessible
                                         accessibilityRole="button"
                                         accessibilityLabel={normalizeA11yLabel(
-                                            `Select ${labelExtractor(item)}`
+                                            t('Select {item}', { item: labelExtractor(item) })
                                         )}
                                         style={
                                             selected &&
@@ -96,13 +99,13 @@ const DropdownSheet = <T,>({
                                 )}
                             />
                         ) : (
-                            <Text style={styles.emptyText}>No Items</Text>
+                            <Text style={styles.emptyText}>{t('No Items')}</Text>
                         )}
                         {search && (
                             <TextInput
                                 accessible
-                                accessibilityLabel={`${modalTitle} filter`}
-                                placeholder="Filter..."
+                                accessibilityLabel={`${translatedTitle} ${t('Filter')}`}
+                                placeholder={t('Filter...')}
                                 placeholderTextColor={theme.color.text._300}
                                 style={styles.searchBar}
                                 value={searchFilter}
@@ -115,12 +118,12 @@ const DropdownSheet = <T,>({
             <Pressable
                 accessible
                 accessibilityRole="button"
-                accessibilityLabel={normalizeA11yLabel(modalTitle)}
-                accessibilityHint="Opens selection list"
+                accessibilityLabel={normalizeA11yLabel(translatedTitle)}
+                accessibilityHint={t('Opens selection list')}
                 style={[style, styles.button]}
                 onPress={() => setShowList(true)}>
                 {selected && <Text style={styles.buttonText}>{labelExtractor(selected)}</Text>}
-                {!selected && <Text style={styles.placeholderText}>{placeholder}</Text>}
+                {!selected && <Text style={styles.placeholderText}>{translatedPlaceholder}</Text>}
                 <Entypo name="chevron-down" color={theme.color.primary._800} size={18} />
             </Pressable>
         </View>

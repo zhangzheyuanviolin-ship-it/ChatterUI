@@ -2,6 +2,7 @@ import ThemedButton from '@components/buttons/ThemedButton'
 import Alert from '@components/views/Alert'
 import { APIConfiguration } from '@lib/engine/API/APIBuilder.types'
 import { APIManager } from '@lib/engine/API/APIManagerState'
+import { t } from '@lib/i18n'
 import { Logger } from '@lib/state/Logger'
 import { Theme } from '@lib/theme/ThemeManager'
 import { saveStringToDownload } from '@lib/utils/File'
@@ -19,12 +20,12 @@ const TemplateItem: React.FC<TemplateItemProps> = ({ item, index }) => {
 
     const handleDelete = () => {
         Alert.alert({
-            title: 'Delete Template',
-            description: `Are you sure you want to delete "${item.name}"?`,
+            title: t('Delete Template'),
+            description: t('Are you sure you want to delete "{name}"?', { name: item.name }),
             buttons: [
-                { label: 'Cancel' },
+                { label: t('Cancel') },
                 {
-                    label: 'Delete Template',
+                    label: t('Delete Template'),
                     onPress: () => {
                         removeTemplate(index)
                     },
@@ -36,7 +37,7 @@ const TemplateItem: React.FC<TemplateItemProps> = ({ item, index }) => {
 
     const handleExport = () => {
         saveStringToDownload(JSON.stringify(item), `${item.name}.json`, 'utf8').then(() => {
-            Logger.infoToast(`Saved ${item.name}.json To Downloads`)
+            Logger.infoToast(t('Saved {name}.json To Downloads', { name: item.name }))
         })
     }
 

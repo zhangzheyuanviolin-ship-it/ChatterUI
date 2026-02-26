@@ -6,6 +6,7 @@ import Alert from '@components/views/Alert'
 import { AppSettings, Global } from '@lib/constants/GlobalValues'
 import { Llama } from '@lib/engine/Local/LlamaLocal'
 import { KV } from '@lib/engine/Local/Model'
+import { t } from '@lib/i18n'
 import { Logger } from '@lib/state/Logger'
 import { readableFileSize } from '@lib/utils/File'
 import { useFocusEffect } from 'expo-router'
@@ -57,15 +58,20 @@ const ModelSettings: React.FC<ModelSettingsProp> = ({ modelImporting, modelLoadi
 
     const handleDeleteKV = () => {
         Alert.alert({
-            title: 'Delete KV Cache',
-            description: `Are you sure you want to delete the KV Cache? This cannot be undone. \n\n This will clear up ${readableFileSize(kvSize)} of space.`,
-            buttons: [
-                { label: 'Cancel' },
+            title: t('Delete KV Cache'),
+            description: t(
+                'Are you sure you want to delete the KV Cache? This cannot be undone.\n\nThis will clear up {size} of space.',
                 {
-                    label: 'Delete KV Cache',
+                    size: readableFileSize(kvSize),
+                }
+            ),
+            buttons: [
+                { label: t('Cancel') },
+                {
+                    label: t('Delete KV Cache'),
                     onPress: async () => {
                         await KV.deleteKV()
-                        Logger.info('KV Cache deleted!')
+                        Logger.info(t('KV Cache deleted!'))
                         getKVSize()
                     },
                     type: 'warning',
@@ -152,13 +158,15 @@ const ModelSettings: React.FC<ModelSettingsProp> = ({ modelImporting, modelLoadi
                 description={
                     saveKV
                         ? ''
-                        : 'Saves the KV cache on generations, allowing you to continue sessions after closing the app. Must use the same model for this to function properly. Saving the KV cache file may be very big and negatively impact battery life!'
+                        : t(
+                              'Saves the KV cache on generations, allowing you to continue sessions after closing the app. Must use the same model for this to function properly. Saving the KV cache file may be very big and negatively impact battery life!'
+                          )
                 }
             />
             {saveKV && (
                 <ThemedButton
                     buttonStyle={{ marginTop: 8 }}
-                    label={'Purge KV Cache (' + readableFileSize(kvSize) + ')'}
+                    label={t('Purge KV Cache ({size})', { size: readableFileSize(kvSize) })}
                     onPress={handleDeleteKV}
                     variant={kvSize === 0 ? 'disabled' : 'critical'}
                 />

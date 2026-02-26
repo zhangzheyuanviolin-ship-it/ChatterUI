@@ -2,6 +2,7 @@ import SupportButton from '@components/buttons/SupportButton'
 import ThemedButton from '@components/buttons/ThemedButton'
 import HeaderTitle from '@components/views/HeaderTitle'
 import { AppSettings } from '@lib/constants/GlobalValues'
+import { t } from '@lib/i18n'
 import { Logger } from '@lib/state/Logger'
 import { Theme } from '@lib/theme/ThemeManager'
 import appConfig from 'app.config'
@@ -18,7 +19,7 @@ const AboutScreen = () => {
     const updateCounter = () => {
         if (devMode) return
         if (counter === 6) {
-            Logger.infoToast(`You have enabled dev mode.`)
+            Logger.infoToast(t('You have enabled dev mode.'))
             setDevMode(true)
         }
         setCounter(counter + 1)
@@ -27,18 +28,18 @@ const AboutScreen = () => {
     const version = 'v' + appConfig.expo.version
     return (
         <View style={styles.container}>
-            <HeaderTitle title="About" />
+            <HeaderTitle title={t('About')} />
             <TouchableOpacity activeOpacity={0.8} onPress={updateCounter}>
                 <Image source={require('../../assets/images/icon.png')} style={styles.icon} />
             </TouchableOpacity>
 
             <Text style={styles.titleText}>ChatterUI</Text>
             <Text style={styles.subtitleText}>
-                Version {version} {devMode && '[DEV MODE]'}
+                {t('Version')} {version} {devMode && '[DEV MODE]'}
             </Text>
             {devMode && (
                 <ThemedButton
-                    label="Disable Dev Mode"
+                    label={t('Disable Dev Mode')}
                     variant="critical"
                     buttonStyle={{
                         marginTop: spacing.xl,
@@ -46,31 +47,32 @@ const AboutScreen = () => {
                     onPress={() => {
                         setCounter(0)
                         setDevMode(false)
-                        Logger.info('Dev mode disabled')
+                        Logger.info(t('Dev mode disabled'))
                     }}
                 />
             )}
 
             <Text style={styles.body}>
-                ChatterUI is a free and open-source application developed by Vali-98
+                {t('ChatterUI is a free and open-source application developed by Vali-98')}
             </Text>
             <Text style={{ marginBottom: spacing.xl3, ...styles.body }}>
-                This app is a passion project I develop in my free time. If you're enjoying the app,
-                consider supporting its development!
+                {t(
+                    "This app is a passion project I develop in my free time. If you're enjoying the app, consider supporting its development!"
+                )}
             </Text>
             <Text style={{ ...styles.body, marginBottom: spacing.m }}>
-                Donate to ChatterUI here:
+                {t('Donate to ChatterUI here:')}
             </Text>
 
             <SupportButton />
 
-            <Text style={styles.body}>Got an issue? Report it here:</Text>
-            <Text style={styles.subtitleText}>(Don't forget to add your Logs!)</Text>
+            <Text style={styles.body}>{t('Got an issue? Report it here:')}</Text>
+            <Text style={styles.subtitleText}>{t("(Don't forget to add your Logs!)")}</Text>
 
             <ThemedButton
                 buttonStyle={{ marginTop: spacing.m }}
                 variant="secondary"
-                label="Github Repository"
+                label={t('Github Repository')}
                 iconName="github"
                 iconSize={20}
                 onPress={() => {

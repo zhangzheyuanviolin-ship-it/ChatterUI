@@ -6,6 +6,7 @@ import PopupMenu from '@components/views/PopupMenu'
 import { AntDesign } from '@expo/vector-icons'
 import { useAvatarViewerStore } from '@lib/state/AvatarViewer'
 import { CharacterCardData, Characters } from '@lib/state/Characters'
+import { t } from '@lib/i18n'
 import { Theme } from '@lib/theme/ThemeManager'
 import AvatarViewer from '@components/views/AvatarViewer'
 import * as DocumentPicker from 'expo-document-picker'
@@ -54,12 +55,12 @@ const UserCardEditor = () => {
 
     const handleDeleteImage = () => {
         Alert.alert({
-            title: `Delete Image`,
-            description: `Are you sure you want to delete this image? This cannot be undone.`,
+            title: t('Delete Image'),
+            description: t('Are you sure you want to delete this image? This cannot be undone.'),
             buttons: [
-                { label: 'Cancel' },
+                { label: t('Cancel') },
                 {
-                    label: 'Delete Image',
+                    label: t('Delete Image'),
                     onPress: () => {
                         Characters.deleteImage(imageID)
                     },
@@ -77,7 +78,7 @@ const UserCardEditor = () => {
                     placement="right"
                     options={[
                         {
-                            label: 'Change Image',
+                            label: t('Change Image'),
                             icon: 'picture',
                             onPress: (menu) => {
                                 menu.current?.close()
@@ -85,7 +86,7 @@ const UserCardEditor = () => {
                             },
                         },
                         {
-                            label: 'View Image',
+                            label: t('View Image'),
                             icon: 'search1',
                             onPress: (menu) => {
                                 menu.current?.close()
@@ -93,7 +94,7 @@ const UserCardEditor = () => {
                             },
                         },
                         {
-                            label: 'Delete Image',
+                            label: t('Delete Image'),
                             icon: 'delete',
                             onPress: (menu) => {
                                 menu.current?.close()
@@ -120,7 +121,7 @@ const UserCardEditor = () => {
                                 name: text,
                             })
                     }}
-                    placeholder="Empty names are discouraged!"
+                    placeholder={t('Empty names are discouraged!')}
                 />
             </View>
             <ThemedTextInput
@@ -135,7 +136,7 @@ const UserCardEditor = () => {
                             description: text,
                         })
                 }}
-                placeholder="Describe this user..."
+                placeholder={t('Describe this user...')}
             />
             <View style={{ flex: 1, paddingBottom: spacing.m }} />
             <Text
@@ -144,10 +145,10 @@ const UserCardEditor = () => {
                     marginTop: spacing.xl2,
                     alignSelf: 'center',
                 }}>
-                Hint: Swipe Left or press <AntDesign name="menu-unfold" size={16} /> to open the
-                Users drawer
+                {t('Hint: Swipe Left or press')} <AntDesign name="menu-unfold" size={16} />{' '}
+                {t('to open the Users drawer')}
             </Text>
-            <ThemedButton label="Save" onPress={saveCard} iconName="save" />
+            <ThemedButton label={t('Save')} onPress={saveCard} iconName="save" />
         </View>
     )
 }

@@ -1,3 +1,4 @@
+import { t } from '@lib/i18n'
 import { Theme } from '@lib/theme/ThemeManager'
 import { firstDefined, normalizeA11yLabel } from '@lib/utils/A11y'
 import React from 'react'
@@ -17,10 +18,12 @@ const ThemedSwitch: React.FC<ThemedSwitchProps> = ({
     onChangeValue,
 }) => {
     const { color, spacing } = Theme.useTheme()
+    const translatedLabel = label ? t(label) : undefined
+    const translatedDescription = description ? t(description) : undefined
     const accessibilityLabel = firstDefined(
-        normalizeA11yLabel(label),
-        normalizeA11yLabel(description),
-        'Switch'
+        normalizeA11yLabel(translatedLabel),
+        normalizeA11yLabel(translatedDescription),
+        t('Switch')
     )
     return (
         <View>
@@ -40,24 +43,24 @@ const ThemedSwitch: React.FC<ThemedSwitchProps> = ({
                     onValueChange={onChangeValue}
                     value={value}
                 />
-                {label && (
+                {translatedLabel && (
                     <Text
                         style={{
                             marginLeft: spacing.xl,
                             color: value ? color.text._100 : color.text._300,
                         }}>
-                        {label}
+                        {translatedLabel}
                     </Text>
                 )}
             </View>
-            {description && (
+            {translatedDescription && (
                 <Text
                     style={{
                         color: color.text._400,
                         paddingBottom: spacing.xs,
                         marginBottom: spacing.m,
                     }}>
-                    {description}
+                    {translatedDescription}
                 </Text>
             )}
         </View>

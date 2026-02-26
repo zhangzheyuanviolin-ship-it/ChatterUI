@@ -17,6 +17,7 @@ import HeaderButton from '@components/views/HeaderButton'
 import PopupMenu from '@components/views/PopupMenu'
 import TextBoxModal from '@components/views/TextBoxModal'
 import { useState } from 'react'
+import { t } from '@lib/i18n'
 
 const TemplateManager = () => {
     // eslint-disable-next-line react-compiler/react-compiler
@@ -39,7 +40,7 @@ const TemplateManager = () => {
                 paddingBottom: spacing.xl2,
                 flex: 1,
             }}>
-            <HeaderTitle title="Template Manager" />
+            <HeaderTitle title={t('Template Manager')} />
             <HeaderButton
                 headerRight={() => (
                     <PopupMenu
@@ -47,7 +48,7 @@ const TemplateManager = () => {
                         placement="bottom"
                         options={[
                             {
-                                label: 'Import Template',
+                                label: t('Import Template'),
                                 icon: 'download',
                                 onPress: async (m) => {
                                     m.current?.close()
@@ -59,7 +60,7 @@ const TemplateManager = () => {
                                 },
                             },
                             {
-                                label: 'Paste Template',
+                                label: t('Paste Template'),
                                 icon: 'file1',
                                 onPress: (m) => {
                                     m.current?.close()
@@ -67,7 +68,7 @@ const TemplateManager = () => {
                                 },
                             },
                             {
-                                label: 'Get Templates',
+                                label: t('Get Templates'),
                                 icon: 'github',
                                 onPress: (m) => {
                                     m.current?.close()
@@ -77,7 +78,7 @@ const TemplateManager = () => {
                                 },
                             },
                             {
-                                label: 'Learn About Templates',
+                                label: t('Learn About Templates'),
                                 icon: 'info',
                                 onPress: (m) => {
                                     m.current?.close()
@@ -97,12 +98,12 @@ const TemplateManager = () => {
                         const data = JSON.parse(e)
                         addTemplate(data)
                     } catch (e) {
-                        Logger.errorToast('Failed to import: ' + e)
+                        Logger.errorToast(t('Failed to import: {error}', { error: String(e) }))
                     }
                 }}
                 multiline
                 showPaste
-                title="Paste Theme Here"
+                title={t('Paste Theme Here')}
             />
             {templates.length > 0 && (
                 <FlatList
@@ -131,7 +132,7 @@ const TemplateManager = () => {
                             fontStyle: 'italic',
                             marginTop: spacing.l,
                         }}>
-                        No Custom Templates Added
+                        {t('No Custom Templates Added')}
                     </Text>
                 </View>
             )}

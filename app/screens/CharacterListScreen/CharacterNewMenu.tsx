@@ -1,5 +1,6 @@
 import PopupMenu from '@components/views/PopupMenu'
 import TextBoxModal from '@components/views/TextBoxModal'
+import { t } from '@lib/i18n'
 import { Characters } from '@lib/state/Characters'
 import { Logger } from '@lib/state/Logger'
 import { useRouter } from 'expo-router'
@@ -24,7 +25,7 @@ const CharacterNewMenu: React.FC<CharacterNewMenuProps> = ({ nowLoading, setNowL
 
     const handleCreateCharacter = async (text: string) => {
         if (!text) {
-            Logger.errorToast('Name Cannot Be Empty!')
+            Logger.errorToast(t('Name Cannot Be Empty!'))
             return
         }
         Characters.db.mutate.createCard(text).then(async (id) => {
@@ -40,16 +41,16 @@ const CharacterNewMenu: React.FC<CharacterNewMenuProps> = ({ nowLoading, setNowL
         <>
             <TextBoxModal
                 booleans={[showNewChar, setShowNewChar]}
-                title="Create New Character"
+                title={t('Create New Character')}
                 onConfirm={handleCreateCharacter}
-                placeholder="Name..."
+                placeholder={t('Name...')}
             />
 
             <PopupMenu
                 icon="adduser"
                 options={[
                     {
-                        label: 'Import From File',
+                        label: t('Import From File'),
                         onPress: (menu) => {
                             Characters.importCharacter()
                             menu.current?.close()
@@ -57,7 +58,7 @@ const CharacterNewMenu: React.FC<CharacterNewMenuProps> = ({ nowLoading, setNowL
                         icon: 'upload',
                     },
                     {
-                        label: 'Create Character',
+                        label: t('Create Character'),
                         onPress: (menu) => {
                             setShowNewChar(true)
                             menu.current?.close()

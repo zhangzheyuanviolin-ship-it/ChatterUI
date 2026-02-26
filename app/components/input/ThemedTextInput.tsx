@@ -1,3 +1,4 @@
+import { t } from '@lib/i18n'
 import { useUnfocusTextInput } from '@lib/hooks/UnfocusTextInput'
 import { Theme } from '@lib/theme/ThemeManager'
 import { firstDefined, normalizeA11yLabel } from '@lib/utils/A11y'
@@ -24,15 +25,18 @@ const ThemedTextInput: React.FC<ThemedTextInputProps> = ({
 }) => {
     const { color } = Theme.useTheme()
     const ref = useUnfocusTextInput()
+    const translatedLabel = label ? t(label) : undefined
+    const translatedDescription = description ? t(description) : undefined
+    const translatedPlaceholder = rest.placeholder ? t(rest.placeholder) : undefined
     const a11yLabel = firstDefined(
-        normalizeA11yLabel(rest.accessibilityLabel),
-        normalizeA11yLabel(label),
-        normalizeA11yLabel(rest.placeholder),
-        'Text input'
+        normalizeA11yLabel(rest.accessibilityLabel ? t(rest.accessibilityLabel) : undefined),
+        normalizeA11yLabel(translatedLabel),
+        normalizeA11yLabel(translatedPlaceholder),
+        t('Text input')
     )
     const a11yHint = firstDefined(
-        normalizeA11yLabel(rest.accessibilityHint),
-        normalizeA11yLabel(description)
+        normalizeA11yLabel(rest.accessibilityHint ? t(rest.accessibilityHint) : undefined),
+        normalizeA11yLabel(translatedDescription)
     )
 
     return (
@@ -41,13 +45,13 @@ const ThemedTextInput: React.FC<ThemedTextInputProps> = ({
                 flex: 1,
                 ...containerStyle,
             }}>
-            {label && (
+            {translatedLabel && (
                 <Text
                     style={{
                         color: color.text._100,
                         marginBottom: 8,
                     }}>
-                    {label}
+                    {translatedLabel}
                 </Text>
             )}
             <TextInput
@@ -69,9 +73,9 @@ const ThemedTextInput: React.FC<ThemedTextInputProps> = ({
                     },
                     style,
                 ]}
-                placeholder="----"
                 placeholderTextColor={color.text._500}
                 {...rest}
+                placeholder={translatedPlaceholder ?? rest.placeholder}
             />
         </View>
     )

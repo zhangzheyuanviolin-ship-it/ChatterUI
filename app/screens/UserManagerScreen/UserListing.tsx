@@ -2,6 +2,7 @@ import Alert from '@components/views/Alert'
 import Avatar from '@components/views/Avatar'
 import Drawer from '@components/views/Drawer'
 import PopupMenu from '@components/views/PopupMenu'
+import { t } from '@lib/i18n'
 import { Characters } from '@lib/state/Characters'
 import { Theme } from '@lib/theme/ThemeManager'
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native'
@@ -19,7 +20,7 @@ const getTimeStamp = (oldtime: number) => {
     const now = Date.now()
     const delta = now - oldtime
     if (delta < now % day_ms) return new Date(oldtime).toLocaleTimeString()
-    if (delta < (now % day_ms) + day_ms) return 'Yesterday'
+    if (delta < (now % day_ms) + day_ms) return t('Yesterday')
     return new Date(oldtime).toLocaleDateString()
 }
 
@@ -41,18 +42,20 @@ const UserListing: React.FC<CharacterListingProps> = ({ user }) => {
 
     const handleDeleteCard = async (menuRef: React.MutableRefObject<Menu | null>) => {
         Alert.alert({
-            title: 'Delete User',
-            description: `Are you sure you want to delete '${user.name}'?\nThis cannot be undone.`,
+            title: t('Delete User'),
+            description: t("Are you sure you want to delete '{name}'?\nThis cannot be undone.", {
+                name: user.name,
+            }),
             buttons: [
-                { label: 'Cancel' },
+                { label: t('Cancel') },
                 {
-                    label: 'Delete User',
+                    label: t('Delete User'),
                     onPress: async () => {
                         await Characters.db.mutate.deleteCard(user.id)
 
                         await Characters.db.query.cardList('user').then(async (list) => {
                             if (list.length === 0) {
-                                const defaultName = 'User'
+                                const defaultName = t('User')
                                 const id = await Characters.db.mutate.createCard(
                                     defaultName,
                                     'user'
@@ -72,12 +75,12 @@ const UserListing: React.FC<CharacterListingProps> = ({ user }) => {
 
     const handleCloneCard = (menuRef: React.MutableRefObject<Menu | null>) => {
         Alert.alert({
-            title: `Clone User`,
-            description: `Are you sure you want to clone '${user.name}'?`,
+            title: t('Clone User'),
+            description: t("Are you sure you want to clone '{name}'?", { name: user.name }),
             buttons: [
-                { label: 'Cancel' },
+                { label: t('Cancel') },
                 {
-                    label: 'Clone User',
+                    label: t('Clone User'),
                     onPress: async () => {
                         menuRef.current?.close()
                         await Characters.db.mutate.duplicateCard(user.id)
@@ -95,7 +98,7 @@ const UserListing: React.FC<CharacterListingProps> = ({ user }) => {
             <TouchableOpacity
                 accessible
                 accessibilityRole="button"
-                accessibilityLabel={`Switch to user ${user.name}`}
+                accessibilityLabel={t('Switch to user {name}', { name: user.name })}
                 style={styles.longButton}
                 onPress={async () => {
                     await setCard(user.id)
@@ -126,12 +129,12 @@ const UserListing: React.FC<CharacterListingProps> = ({ user }) => {
                     icon="edit"
                     options={[
                         {
-                            label: 'Clone',
+                            label: t('Clone'),
                             icon: 'copy1',
                             onPress: handleCloneCard,
                         },
                         {
-                            label: 'Delete',
+                            label: t('Delete'),
                             icon: 'delete',
                             warning: true,
                             onPress: handleDeleteCard,

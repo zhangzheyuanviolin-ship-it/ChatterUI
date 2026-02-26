@@ -1,5 +1,6 @@
 import ThemedButton from '@components/buttons/ThemedButton'
 import Avatar from '@components/views/Avatar'
+import { t } from '@lib/i18n'
 import { Characters } from '@lib/state/Characters'
 import { Theme } from '@lib/theme/ThemeManager'
 import { useRouter } from 'expo-router'
@@ -38,7 +39,7 @@ const UserInfo = () => {
 
             <ThemedButton
                 onPress={() => router.push('/screens/UserManagerScreen')}
-                label={userName}
+                label={userName ? t(userName) : t('User')}
                 labelStyle={{ fontSize: fontSize.xl }}
                 iconName="edit"
                 variant="tertiary"

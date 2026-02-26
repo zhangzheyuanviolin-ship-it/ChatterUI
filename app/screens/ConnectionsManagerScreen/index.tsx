@@ -1,5 +1,6 @@
 import ThemedButton from '@components/buttons/ThemedButton'
 import { AntDesign, Ionicons } from '@expo/vector-icons'
+import { t } from '@lib/i18n'
 import { APIManager } from '@lib/engine/API/APIManagerState'
 import { Theme } from '@lib/theme/ThemeManager'
 import { useRouter } from 'expo-router'
@@ -35,8 +36,8 @@ const ConnectionsManagerScreen = () => {
                 headerRight={() => (
                     <Pressable
                         accessibilityRole="button"
-                        accessibilityLabel="Template manager"
-                        accessibilityHint="Opens API template list"
+                        accessibilityLabel={t('Template manager')}
+                        accessibilityHint={t('Opens API template list')}
                         onPress={() => {
                             router.push('/screens/ConnectionsManagerScreen/TemplateManager')
                         }}>
@@ -67,7 +68,7 @@ const ConnectionsManagerScreen = () => {
                             fontStyle: 'italic',
                             marginTop: spacing.l,
                         }}>
-                        No Connections Added
+                        {t('No Connections Added')}
                     </Text>
                 </View>
             )}
@@ -77,7 +78,7 @@ const ConnectionsManagerScreen = () => {
                     marginHorizontal: spacing.xl,
                 }}
                 onPress={() => router.push('/screens/ConnectionsManagerScreen/AddConnection')}
-                label="Add Connection"
+                label={t('Add Connection')}
             />
         </SafeAreaView>
     )

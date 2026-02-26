@@ -1,3 +1,4 @@
+import { t } from '@lib/i18n'
 import { Theme } from '@lib/theme/ThemeManager'
 import React, { ReactNode } from 'react'
 import { TextProps, TextStyle } from 'react-native'
@@ -16,6 +17,7 @@ const SectionTitle = ({
     visible?: boolean
 }) => {
     const { color, spacing } = Theme.useTheme()
+    const titleText = typeof children === 'string' ? t(children) : children
     if (visible)
         return (
             <TText
@@ -28,7 +30,7 @@ const SectionTitle = ({
                     borderColor: color.neutral._500,
                     ...style,
                 }}>
-                {children}
+                {titleText}
             </TText>
         )
 }

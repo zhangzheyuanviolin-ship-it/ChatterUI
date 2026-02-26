@@ -1,4 +1,5 @@
 import { Ionicons } from '@expo/vector-icons'
+import { t } from '@lib/i18n'
 import { Theme } from '@lib/theme/ThemeManager'
 import { Text, View } from 'react-native'
 
@@ -21,7 +22,7 @@ const CharSearchEmpty = () => {
                     fontStyle: 'italic',
                     fontSize: fontSize.l,
                 }}>
-                No Characters Match Search Result
+                {t('No Characters Match Search Result')}
             </Text>
         </View>
     )

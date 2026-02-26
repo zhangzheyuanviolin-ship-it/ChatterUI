@@ -1,5 +1,6 @@
 import ThemedButton from '@components/buttons/ThemedButton'
 import { AntDesign } from '@expo/vector-icons'
+import { t } from '@lib/i18n'
 import { Logger } from '@lib/state/Logger'
 import { Theme } from '@lib/theme/ThemeManager'
 import React, { useState } from 'react'
@@ -43,6 +44,8 @@ const StringArrayEditor: React.FC<StringArrayEditorProps> = ({
     const { color, borderRadius } = Theme.useTheme()
     const styles = useStyles()
     const [newData, setNewData] = useState('')
+    const translatedLabel = label ? t(label) : undefined
+    const translatedPlaceholder = t(placeholder)
     const filteredSuggestions = suggestions.filter(
         (item) => item.toLowerCase().includes(newData.toLowerCase()) && !value.includes(item)
     )
@@ -52,11 +55,11 @@ const StringArrayEditor: React.FC<StringArrayEditorProps> = ({
 
     const addData = (newData: string) => {
         if (newData === '') {
-            Logger.warnToast('Value cannot be empty')
+            Logger.warnToast(t('Value cannot be empty'))
             return
         }
         if (value.includes(newData)) {
-            Logger.warnToast('Value already exists')
+            Logger.warnToast(t('Value already exists'))
             return
         }
         setNewData('')
@@ -65,7 +68,7 @@ const StringArrayEditor: React.FC<StringArrayEditorProps> = ({
 
     return (
         <View style={[styles.mainContainer, containerStyle]}>
-            {label && <Text style={styles.title}>{label}</Text>}
+            {translatedLabel && <Text style={styles.title}>{translatedLabel}</Text>}
 
             <View style={styles.contentContainer}>
                 {value.length !== 0 && (
@@ -93,7 +96,7 @@ const StringArrayEditor: React.FC<StringArrayEditorProps> = ({
                         }}>
                         {!filterOnly && (
                             <Text style={{ color: color.text._400, marginBottom: 4 }}>
-                                Suggestions
+                                {t('Suggestions')}
                             </Text>
                         )}
                         <ScrollView
@@ -128,7 +131,7 @@ const StringArrayEditor: React.FC<StringArrayEditorProps> = ({
                         onChangeText={setNewData}
                         keyboardType="default"
                         multiline
-                        placeholder={placeholder}
+                        placeholder={translatedPlaceholder}
                         placeholderTextColor={color.text._700}
                     />
 

@@ -91,6 +91,8 @@ const CharacterListHeader: React.FC<CharacterListHeaderProps> = ({ resultLength 
                     <ThemedButton
                         iconName="tag"
                         variant="tertiary"
+                        accessibilityLabel={t('Tag filter')}
+                        accessibilityHint={t('Filter characters by tags')}
                         onPress={() => {
                             setShowTags(!showTags)
                             if (showTags) {
@@ -104,6 +106,10 @@ const CharacterListHeader: React.FC<CharacterListHeaderProps> = ({ resultLength 
                     <ThemedButton
                         variant="tertiary"
                         iconName={showSearch ? 'close' : 'search1'}
+                        accessibilityLabel={t(showSearch ? 'Close search' : 'Open search')}
+                        accessibilityHint={t(
+                            showSearch ? 'Closes search filters' : 'Opens search filters'
+                        )}
                         onPress={() => {
                             setShowSearch(!showSearch)
                         }}

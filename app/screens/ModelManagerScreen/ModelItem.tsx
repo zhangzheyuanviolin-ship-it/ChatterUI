@@ -5,6 +5,7 @@ import { AntDesign } from '@expo/vector-icons'
 import { GGMLNameMap } from '@lib/engine/Local'
 import { Llama } from '@lib/engine/Local/LlamaLocal'
 import { Model, ModelListQueryType } from '@lib/engine/Local/Model'
+import { t } from '@lib/i18n'
 import { Logger } from '@lib/state/Logger'
 import { Theme } from '@lib/theme/ThemeManager'
 import { readableFileSize } from '@lib/utils/File'
@@ -51,18 +52,22 @@ const ModelItem: React.FC<ModelItemProps> = ({
     const isInvalid = Model.isInitialEntry(item)
     const handleDeleteModel = () => {
         Alert.alert({
-            title: 'Delete Model',
+            title: t('Delete Model'),
             description:
-                `Are you sure you want to delete "${item.name}"?\n\nThis cannot be undone!` +
+                t('Are you sure you want to delete "{name}"?\n\nThis cannot be undone!', {
+                    name: item.name,
+                }) +
                 (!isInvalid
                     ? !item.file_path.startsWith('content')
-                        ? `\n\nThis operation will clear up ${readableFileSize(item.file_size)}`
-                        : '\n\n(This will not delete external model files, just this entry)'
+                        ? t('\n\nThis operation will clear up {size}', {
+                              size: readableFileSize(item.file_size),
+                          })
+                        : t('\n\n(This will not delete external model files, just this entry)')
                     : ''),
             buttons: [
-                { label: 'Cancel' },
+                { label: t('Cancel') },
                 {
-                    label: 'Delete Model',
+                    label: t('Delete Model'),
                     onPress: async () => {
                         if (modelId === item.id) {
                             await unloadModel()
@@ -94,7 +99,7 @@ const ModelItem: React.FC<ModelItemProps> = ({
                 onConfirm={async (name) => {
                     await Model.updateName(name, item.id)
                 }}
-                title="Rename Model"
+                title={t('Rename Model')}
                 defaultValue={item.name}
             />
 
@@ -102,7 +107,7 @@ const ModelItem: React.FC<ModelItemProps> = ({
             {!isInvalid && (
                 <View style={styles.tagContainer}>
                     <Text style={styles.tag}>
-                        {item.params === 'N/A' ? 'No Param Size' : item.params}
+                        {item.params === 'N/A' ? t('No Param Size') : item.params}
                     </Text>
                     <Text style={styles.tag}>{quant}</Text>
                     <Text style={styles.tag}>{readableFileSize(item.file_size)}</Text>
@@ -110,26 +115,30 @@ const ModelItem: React.FC<ModelItemProps> = ({
                         {item.architecture}
                     </Text>
                     <Text style={styles.tag}>
-                        {item.file_path.startsWith('content') ? 'External' : 'Internal'}
+                        {item.file_path.startsWith('content') ? t('External') : t('Internal')}
                     </Text>
                 </View>
             )}
             {isInvalid && (
                 <View style={styles.tagContainer}>
-                    <Text style={styles.tag}>Model is Invalid</Text>
+                    <Text style={styles.tag}>{t('Model is Invalid')}</Text>
                 </View>
             )}
             {!isInvalid && !isMMPROJ && (
-                <Text style={styles.subtitle}>Context Length: {item.context_length}</Text>
+                <Text style={styles.subtitle}>
+                    {t('Context Length')}: {item.context_length}
+                </Text>
             )}
-            <Text style={styles.subtitle}>File: {item.file.replace('.gguf', '')}</Text>
+            <Text style={styles.subtitle}>
+                {t('File')}: {item.file.replace('.gguf', '')}
+            </Text>
             <View style={styles.buttonContainer}>
                 {!isMMPROJ && mmprojList.length > 0 && (
                     <TouchableOpacity
                         accessible
                         accessibilityRole="button"
                         accessibilityLabel={
-                            item.mmprojLink ? 'Unlink vision model' : 'Link vision model'
+                            t(item.mmprojLink ? 'Unlink vision model' : 'Link vision model')
                         }
                         style={styles.button}
                         onPress={async () => {
@@ -169,7 +178,7 @@ const ModelItem: React.FC<ModelItemProps> = ({
                     disabled={disableEdit}
                     accessible
                     accessibilityRole="button"
-                    accessibilityLabel={`Rename model ${item.name}`}
+                    accessibilityLabel={t('Rename model {name}', { name: item.name })}
                     style={styles.button}
                     onPress={() => {
                         setShowEdit(true)
@@ -184,7 +193,7 @@ const ModelItem: React.FC<ModelItemProps> = ({
                     disabled={disableDelete}
                     accessible
                     accessibilityRole="button"
-                    accessibilityLabel={`Delete model ${item.name}`}
+                    accessibilityLabel={t('Delete model {name}', { name: item.name })}
                     style={styles.button}
                     onPress={() => {
                         handleDeleteModel()
@@ -201,7 +210,10 @@ const ModelItem: React.FC<ModelItemProps> = ({
                         disabled={loadToggle}
                         accessible
                         accessibilityRole="button"
-                        accessibilityLabel={isLoaded ? `Unload model ${item.name}` : `Load model ${item.name}`}
+                        accessibilityLabel={t(
+                            isLoaded ? 'Unload model {name}' : 'Load model {name}',
+                            { name: item.name }
+                        )}
                         style={styles.button}
                         onPress={async () => {
                             if (isLoaded) {
@@ -233,7 +245,7 @@ const ModelItem: React.FC<ModelItemProps> = ({
             </View>
             {((showMMPROJSelector && mmprojList.length > 0) || (item.mmprojLink && !isMMPROJ)) && (
                 <DropdownSheet
-                    modalTitle="Select MMPROJ Model"
+                    modalTitle={t('Select MMPROJ Model')}
                     containerStyle={{ marginTop: 12, marginBottom: 4 }}
                     data={mmprojList}
                     selected={
@@ -246,7 +258,9 @@ const ModelItem: React.FC<ModelItemProps> = ({
                             if (item.mmprojLink) await Model.removeMMPROJLink(item)
                             await Model.createMMPROJLink(item, value)
                         } catch (e) {
-                            Logger.errorToast('Failed to link model: ' + e)
+                            Logger.errorToast(
+                                t('Failed to link model: {error}', { error: String(e) })
+                            )
                         }
                     }}
                 />

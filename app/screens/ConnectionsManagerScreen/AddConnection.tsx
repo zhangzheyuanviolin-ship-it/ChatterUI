@@ -5,6 +5,7 @@ import MultiDropdownSheet from '@components/input/MultiDropdownSheet'
 import ThemedTextInput from '@components/input/ThemedTextInput'
 import { CLAUDE_VERSION } from '@lib/constants/GlobalValues'
 import { APIManagerValue, APIManager } from '@lib/engine/API/APIManagerState'
+import { t } from '@lib/i18n'
 import { Logger } from '@lib/state/Logger'
 import { Theme } from '@lib/theme/ThemeManager'
 import { Stack, useRouter } from 'expo-router'
@@ -69,7 +70,7 @@ const AddConnection = () => {
 
     return (
         <SafeAreaView edges={['bottom']} style={styles.mainContainer}>
-            <Stack.Screen options={{ title: 'Add Connection' }} />
+            <Stack.Screen options={{ title: t('Add Connection') }} />
             <ScrollView
                 style={{ flex: 1 }}
                 showsVerticalScrollIndicator={false}
@@ -90,7 +91,7 @@ const AddConnection = () => {
                             model: undefined,
                         })
                     }}
-                    modalTitle="Select Connection Type"
+                    modalTitle={t('Select Connection Type')}
                     search
                 />
 
@@ -111,7 +112,7 @@ const AddConnection = () => {
                                 setValues({ ...values, endpoint: value })
                             }}
                         />
-                        <Text style={styles.hintText}>Note: Use full URL path</Text>
+                        <Text style={styles.hintText}>{t('Note: Use full URL path')}</Text>
                     </View>
                 )}
 
@@ -153,7 +154,7 @@ const AddConnection = () => {
 
                 {template.features.useModel && (
                     <View>
-                        <Text style={styles.title}>Model</Text>
+                        <Text style={styles.title}>{t('Model')}</Text>
                         <View
                             style={{
                                 flexDirection: 'row',
@@ -173,7 +174,7 @@ const AddConnection = () => {
                                         setValues({ ...values, model: item })
                                     }}
                                     search={modelList.length > 10}
-                                    modalTitle="Select Model"
+                                    modalTitle={t('Select Model')}
                                 />
                             )}
                             {template.features.multipleModels && (
@@ -188,7 +189,7 @@ const AddConnection = () => {
                                         setValues({ ...values, model: item })
                                     }}
                                     search={modelList.length > 10}
-                                    modalTitle="Select Model"
+                                    modalTitle={t('Select Model')}
                                 />
                             )}
                             <ThemedButton
@@ -212,7 +213,9 @@ const AddConnection = () => {
                                 setValues({ ...values, firstMessage: value })
                             }}
                         />
-                        <Text style={styles.hintText}>Default first message sent to Claude</Text>
+                        <Text style={styles.hintText}>
+                            {t('Default first message sent to Claude')}
+                        </Text>
                     </View>
                 )}
                 {template.features.usePrefill && (
@@ -224,12 +227,12 @@ const AddConnection = () => {
                                 setValues({ ...values, prefill: value })
                             }}
                         />
-                        <Text style={styles.hintText}>Prefill before model response</Text>
+                        <Text style={styles.hintText}>{t('Prefill before model response')}</Text>
                     </View>
                 )}
             </ScrollView>
             <ThemedButton
-                label="Create API"
+                label={t('Create API')}
                 onPress={() => {
                     addValue(values)
                     router.back()

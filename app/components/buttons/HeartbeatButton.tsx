@@ -1,3 +1,4 @@
+import { t } from '@lib/i18n'
 import { Theme } from '@lib/theme/ThemeManager'
 import React, { useEffect, useState } from 'react'
 import { Text, View } from 'react-native'
@@ -39,6 +40,9 @@ const HeartbeatButton: React.FC<HeartbeatButtonProps> = ({
     callback = () => {},
 }) => {
     const { color, spacing } = Theme.useTheme()
+    const translatedNeutral = t(messageNeutral)
+    const translatedError = t(messageError)
+    const translatedOK = t(messageOK)
     const [status, setStatus] = useState<ResponseStatus>(ResponseStatus.DEFAULT)
 
     useEffect(() => {
@@ -48,11 +52,11 @@ const HeartbeatButton: React.FC<HeartbeatButtonProps> = ({
     const StatusMessage = () => {
         switch (status) {
             case ResponseStatus.DEFAULT:
-                return messageNeutral
+                return translatedNeutral
             case ResponseStatus.ERROR:
-                return messageError
+                return translatedError
             case ResponseStatus.OK:
-                return messageOK
+                return translatedOK
         }
     }
 
@@ -91,7 +95,7 @@ const HeartbeatButton: React.FC<HeartbeatButtonProps> = ({
 
     return (
         <View style={{ flexDirection: 'row', marginTop: 8 }}>
-            <ThemedButton label="Test" onPress={handleCheck} variant="secondary" />
+            <ThemedButton label={buttonText} onPress={handleCheck} variant="secondary" />
             <View
                 style={{
                     marginLeft: 4,

@@ -4,6 +4,7 @@ import { Theme } from '@lib/theme/ThemeManager'
 import { useShallow } from 'zustand/react/shallow'
 import { Llama } from '@lib/engine/Local/LlamaLocal'
 import { AntDesign } from '@expo/vector-icons'
+import { t } from '@lib/i18n'
 
 import * as Progress from 'react-native-progress'
 type ModelInfoHeaderProps = {
@@ -36,16 +37,17 @@ const ModelInfoHeader: React.FC<ModelInfoHeaderProps> = ({
                     style={{
                         flexDirection: 'row',
                     }}>
-                    <Text style={styles.subtitle}>Model Loaded: </Text>
+                    <Text style={styles.subtitle}>{t('Model Loaded')}: </Text>
                     <Text style={styles.modelTitle} ellipsizeMode="tail" numberOfLines={1}>
-                        {modelName ?? 'None'}
+                        {modelName ?? t('None')}
                     </Text>
                 </View>
             )}
             {!modelImporting && !modelLoading && modelListLength === 0 && modelUpdatedAt && (
                 <View>
                     <Text style={styles.hint}>
-                        Hint: Press <AntDesign name="addfile" size={16} /> and import a GGUF model!
+                        {t('Hint: Press')} <AntDesign name="addfile" size={16} />{' '}
+                        {t('and import a GGUF model!')}
                     </Text>
                 </View>
             )}
@@ -69,7 +71,7 @@ const ModelInfoHeader: React.FC<ModelInfoHeaderProps> = ({
                             color: color.text._100,
                             textAlign: 'center',
                         }}>
-                        Importing...
+                        {t('Importing...')}
                     </Text>
                 </View>
             )}

@@ -1,3 +1,4 @@
+import { t } from '@lib/i18n'
 import { Theme } from '@lib/theme/ThemeManager'
 import { normalizeA11yLabel } from '@lib/utils/A11y'
 import Slider from '@react-native-community/slider'
@@ -32,7 +33,8 @@ const ThemedSlider: React.FC<ThemedSliderProps> = ({
 }) => {
     const styles = useStyles()
     const { color } = Theme.useTheme()
-    const sliderLabel = normalizeA11yLabel(label) ?? 'Slider'
+    const translatedLabel = t(label)
+    const sliderLabel = normalizeA11yLabel(translatedLabel) ?? t('Slider')
     const [textValue, setTextValue] = useState(value.toString())
 
     const clampSlider = useCallback(
@@ -60,8 +62,10 @@ const ThemedSlider: React.FC<ThemedSliderProps> = ({
 
     return (
         <View style={{ alignItems: `center` }}>
-            {label && (
-                <Text style={disabled ? styles.itemNameDisabled : styles.itemName}>{label}</Text>
+            {translatedLabel && (
+                <Text style={disabled ? styles.itemNameDisabled : styles.itemName}>
+                    {translatedLabel}
+                </Text>
             )}
             <View style={styles.sliderContainer}>
                 <Slider
@@ -89,7 +93,7 @@ const ThemedSlider: React.FC<ThemedSliderProps> = ({
                     <TextInput
                         editable={!disabled}
                         accessible
-                        accessibilityLabel={`${sliderLabel} value`}
+                        accessibilityLabel={`${sliderLabel} ${t('Value')}`}
                         style={disabled ? styles.textBoxDisabled : styles.textBox}
                         value={textValue}
                         onChangeText={handleTextInputChange}

@@ -1,5 +1,6 @@
 import ThemedButton from '@components/buttons/ThemedButton'
 import TextBoxModal from '@components/views/TextBoxModal'
+import { t } from '@lib/i18n'
 import { Characters } from '@lib/state/Characters'
 import { Theme } from '@lib/theme/ThemeManager'
 import { FlashList } from '@shopify/flash-list'
@@ -47,7 +48,7 @@ const UserList = () => {
                         fontSize: fontSize.l,
                         color: color.text._300,
                     }}>
-                    User Profiles ({data.length})
+                    {t('User Profiles')} ({data.length})
                 </Text>
             </View>
             <View style={{ flex: 1 }}>
@@ -59,7 +60,7 @@ const UserList = () => {
                     estimatedItemSize={100}
                     initialScrollIndex={Math.max(currentIndex, 0)}
                 />
-                <ThemedButton label="New User" onPress={() => setShowNewUser(true)} />
+                <ThemedButton label={t('New User')} onPress={() => setShowNewUser(true)} />
             </View>
         </View>
     )

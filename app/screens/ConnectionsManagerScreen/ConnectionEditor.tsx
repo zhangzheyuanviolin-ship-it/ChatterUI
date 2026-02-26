@@ -7,6 +7,7 @@ import FadeBackrop from '@components/views/FadeBackdrop'
 import { CLAUDE_VERSION } from '@lib/constants/GlobalValues'
 import { APIConfiguration } from '@lib/engine/API/APIBuilder.types'
 import { APIManagerValue, APIManager } from '@lib/engine/API/APIManagerState'
+import { t } from '@lib/i18n'
 import { Logger } from '@lib/state/Logger'
 import { Theme } from '@lib/theme/ThemeManager'
 import { useEffect, useState } from 'react'
@@ -50,7 +51,7 @@ const ConnectionEditor: React.FC<ConnectionEditorProps> = ({
     useEffect(() => {
         const newTemplate = getTemplates().find((item) => item.name === values.configName)
         if (!newTemplate) {
-            Logger.errorToast('Could not get valid template!')
+            Logger.errorToast(t('Could not get valid template!'))
             close()
             return
         }
@@ -107,7 +108,7 @@ const ConnectionEditor: React.FC<ConnectionEditorProps> = ({
                         fontWeight: '500',
                         paddingBottom: spacing.xl2,
                     }}>
-                    Edit Connection
+                    {t('Edit Connection')}
                 </Text>
 
                 <ScrollView
@@ -131,7 +132,7 @@ const ConnectionEditor: React.FC<ConnectionEditorProps> = ({
                                     setValues({ ...values, endpoint: value })
                                 }}
                             />
-                            <Text style={styles.hintText}>Note: Use full URL path</Text>
+                            <Text style={styles.hintText}>{t('Note: Use full URL path')}</Text>
                         </View>
                     )}
 
@@ -173,7 +174,7 @@ const ConnectionEditor: React.FC<ConnectionEditorProps> = ({
 
                     {template.features.useModel && (
                         <View style={{ rowGap: 4 }}>
-                            <Text style={styles.title}>Model</Text>
+                            <Text style={styles.title}>{t('Model')}</Text>
                             <View
                                 style={{
                                     flexDirection: 'row',
@@ -192,7 +193,7 @@ const ConnectionEditor: React.FC<ConnectionEditorProps> = ({
                                             setValues({ ...values, model: item })
                                         }}
                                         search={modelList.length > 10}
-                                        modalTitle="Select Model"
+                                        modalTitle={t('Select Model')}
                                     />
                                 )}
                                 {template.features.multipleModels && (
@@ -207,7 +208,7 @@ const ConnectionEditor: React.FC<ConnectionEditorProps> = ({
                                             setValues({ ...values, model: item })
                                         }}
                                         search={modelList.length > 10}
-                                        modalTitle="Select Model"
+                                        modalTitle={t('Select Model')}
                                     />
                                 )}
                                 <ThemedButton
@@ -232,7 +233,7 @@ const ConnectionEditor: React.FC<ConnectionEditorProps> = ({
                                 }}
                             />
                             <Text style={styles.hintText}>
-                                Default first message sent to Claude
+                                {t('Default first message sent to Claude')}
                             </Text>
                         </View>
                     )}
@@ -245,13 +246,15 @@ const ConnectionEditor: React.FC<ConnectionEditorProps> = ({
                                     setValues({ ...values, prefill: value })
                                 }}
                             />
-                            <Text style={styles.hintText}>Prefill before model response</Text>
+                            <Text style={styles.hintText}>
+                                {t('Prefill before model response')}
+                            </Text>
                         </View>
                     )}
                 </ScrollView>
                 <ThemedButton
                     buttonStyle={{ marginTop: 8 }}
-                    label="Save Changes"
+                    label={t('Save Changes')}
                     onPress={() => {
                         editValue(values, index)
                         close()

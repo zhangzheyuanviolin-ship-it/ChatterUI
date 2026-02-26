@@ -1,4 +1,5 @@
 import { Ionicons } from '@expo/vector-icons'
+import { t } from '@lib/i18n'
 import { Theme } from '@lib/theme/ThemeManager'
 import { View, Text } from 'react-native'
 
@@ -21,7 +22,7 @@ const CharactersEmpty = () => {
                     fontStyle: 'italic',
                     fontSize: fontSize.l,
                 }}>
-                No Characters Found. Try Importing Some!
+                {t('No Characters Found. Try Importing Some!')}
             </Text>
         </View>
     )

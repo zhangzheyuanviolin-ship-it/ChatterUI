@@ -1,5 +1,6 @@
 import Avatar from '@components/views/Avatar'
 import { AppSettings } from '@lib/constants/GlobalValues'
+import { t } from '@lib/i18n'
 import { CharacterSorter } from '@lib/state/CharacterSorter'
 import { Characters, CharInfo } from '@lib/state/Characters'
 import { Chats } from '@lib/state/Chat'
@@ -49,20 +50,20 @@ const CharacterListing: React.FC<CharacterListingProps> = ({
                 chatId = await Chats.db.mutate.createChat(charId)
             }
             if (!chatId) {
-                Logger.errorToast('Chat creation backup has failed! Please report.')
+                Logger.errorToast(t('Chat creation backup has failed! Please report.'))
                 return
             }
             await loadChat(chatId)
             setNowLoading(false)
             router.push('/screens/ChatScreen')
         } catch (error) {
-            Logger.errorToast(`Couldn't load character: ${error}`)
+            Logger.errorToast(t("Couldn't load character: {error}", { error: String(error) }))
             setNowLoading(false)
         }
     }
 
     const getPreviewText = () => {
-        if (!character.latestSwipe || !character.latestName) return '(No Chat Data)'
+        if (!character.latestSwipe || !character.latestName) return t('(No Chat Data)')
         return character.latestName + ':  ' + character.latestSwipe.trim()
     }
 

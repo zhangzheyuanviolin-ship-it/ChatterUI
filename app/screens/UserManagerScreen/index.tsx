@@ -1,4 +1,5 @@
 import Drawer from '@components/views/Drawer'
+import { t } from '@lib/i18n'
 import { Stack } from 'expo-router'
 
 import { SafeAreaView } from 'react-native-safe-area-context'
@@ -18,7 +19,7 @@ const UserManagerScreen = () => {
                 }}>
                 <Stack.Screen
                     options={{
-                        title: 'Edit User',
+                        title: t('Edit User'),
                         animation: 'simple_push',
                         headerRight: () => <Drawer.Button drawerID={Drawer.ID.USERLIST} />,
                     }}

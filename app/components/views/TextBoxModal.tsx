@@ -1,5 +1,6 @@
 import ThemedButton from '@components/buttons/ThemedButton'
 import { FontAwesome } from '@expo/vector-icons'
+import { t } from '@lib/i18n'
 import { Theme } from '@lib/theme/ThemeManager'
 import { normalizeA11yLabel } from '@lib/utils/A11y'
 import { getStringAsync } from 'expo-clipboard'
@@ -44,6 +45,9 @@ const TextBoxModal: React.FC<TextBoxModalProps> = ({
 }) => {
     const styles = useStyles()
     const { color, spacing } = Theme.useTheme()
+    const translatedTitle = t(title)
+    const translatedPlaceholder = placeholder ? t(placeholder) : placeholder
+    const translatedErrorMessage = errorMessage ? t(errorMessage) : errorMessage
     const [text, setText] = useState(defaultValue)
     const [showError, setShowError] = useState(false)
 
@@ -74,7 +78,7 @@ const TextBoxModal: React.FC<TextBoxModalProps> = ({
                 activeOpacity={1}
                 accessible
                 accessibilityRole="button"
-                accessibilityLabel="Close dialog"
+                accessibilityLabel={t('Close dialog')}
                 onPress={handleOverlayClick}
                 style={{
                     flex: 1,
@@ -82,16 +86,16 @@ const TextBoxModal: React.FC<TextBoxModalProps> = ({
                     justifyContent: 'center',
                 }}>
                 <KeyboardAvoidingView style={styles.modalview}>
-                    <Text style={styles.title}>{title}</Text>
+                    <Text style={styles.title}>{translatedTitle}</Text>
                     <View style={styles.inputContainer}>
                         <TextInput
                             autoFocus={autoFocus}
                             accessible
-                            accessibilityLabel={`${normalizeA11yLabel(title) ?? 'Dialog'} input`}
+                            accessibilityLabel={`${normalizeA11yLabel(translatedTitle) ?? t('Dialog')} ${t('input')}`}
                             style={styles.input}
                             value={text}
                             onChangeText={setText}
-                            placeholder={placeholder}
+                            placeholder={translatedPlaceholder}
                             placeholderTextColor={color.text._700}
                             multiline={multiline}
                             numberOfLines={10}
@@ -101,7 +105,7 @@ const TextBoxModal: React.FC<TextBoxModalProps> = ({
                                 style={styles.inputButton}
                                 accessible
                                 accessibilityRole="button"
-                                accessibilityLabel="Paste text"
+                                accessibilityLabel={t('Paste text')}
                                 onPress={async () => {
                                     setText(await getStringAsync())
                                 }}>
@@ -109,7 +113,7 @@ const TextBoxModal: React.FC<TextBoxModalProps> = ({
                             </TouchableOpacity>
                         )}
                     </View>
-                    {showError && <Text style={styles.errorMessage}>{errorMessage}</Text>}
+                    {showError && <Text style={styles.errorMessage}>{translatedErrorMessage}</Text>}
                     <View style={{ flexDirection: 'row' }}>
                         <View style={styles.buttonContainer}>
                             <ThemedButton

@@ -1,4 +1,5 @@
 import { AntDesign } from '@expo/vector-icons'
+import { t } from '@lib/i18n'
 import { Theme } from '@lib/theme/ThemeManager'
 import { firstDefined, normalizeA11yLabel } from '@lib/utils/A11y'
 import { useEffect } from 'react'
@@ -28,7 +29,8 @@ const ThemedCheckbox: React.FC<ThemedCheckboxProps> = ({
 }) => {
     const theme = Theme.useTheme()
     const colorChange = useSharedValue(value ? 1 : 0)
-    const accessibilityLabel = firstDefined(normalizeA11yLabel(label), 'Checkbox')
+    const translatedLabel = label ? t(label) : undefined
+    const accessibilityLabel = firstDefined(normalizeA11yLabel(translatedLabel), t('Checkbox'))
 
     const color1 = theme.color.neutral._100
     const color2 = theme.color.primary._500
@@ -81,13 +83,13 @@ const ThemedCheckbox: React.FC<ThemedCheckboxProps> = ({
                     </Animated.View>
                 )}
             </Animated.View>
-            {label && (
+            {translatedLabel && (
                 <Text
                     style={{
                         paddingLeft: 12,
                         color: value ? theme.color.text._100 : theme.color.text._400,
                     }}>
-                    {label}
+                    {translatedLabel}
                 </Text>
             )}
         </Pressable>

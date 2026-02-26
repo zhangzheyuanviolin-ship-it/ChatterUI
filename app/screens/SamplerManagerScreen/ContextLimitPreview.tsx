@@ -1,6 +1,7 @@
 import { View, Text } from 'react-native'
 import React from 'react'
 import { useContextLimit } from '@lib/hooks/ContextLimit'
+import { t } from '@lib/i18n'
 import { Theme } from '@lib/theme/ThemeManager'
 import * as Progress from 'react-native-progress'
 import { AntDesign, FontAwesome } from '@expo/vector-icons'
@@ -28,7 +29,8 @@ const ContextLimitPreview: React.FC<ContextLimitPreviewProps> = ({ generatedLeng
                 borderColor: color.primary._200,
             }}>
             <Text style={{ color: color.text._100 }}>
-                Context Allocation <Text style={{ color: color.text._400 }}>({contextLimit})</Text>
+                {t('Context Allocation')}{' '}
+                <Text style={{ color: color.text._400 }}>({contextLimit})</Text>
             </Text>
             <Progress.Bar
                 progress={limit}
@@ -47,7 +49,7 @@ const ContextLimitPreview: React.FC<ContextLimitPreviewProps> = ({ generatedLeng
                             color: warning ? color.error._300 : color.primary._400,
                         }}
                     />{' '}
-                    Chat Context: {leftover}
+                    {t('Chat Context')}: {leftover}
                 </Text>
                 <Text style={{ color: color.text._400 }}>
                     <FontAwesome
@@ -56,12 +58,12 @@ const ContextLimitPreview: React.FC<ContextLimitPreviewProps> = ({ generatedLeng
                             color: genLengthColor,
                         }}
                     />{' '}
-                    Generated: {generatedLength}
+                    {t('Generated')}: {generatedLength}
                 </Text>
             </View>
             {warning && (
                 <Text style={{ color: color.error._300 }}>
-                    Low Chat Context will forget messages faster
+                    {t('Low Chat Context will forget messages faster')}
                 </Text>
             )}
         </View>
