@@ -5,6 +5,7 @@ import { useShallow } from 'zustand/react/shallow'
 import StringArrayEditor from '@components/input/StringArrayEditor'
 import ThemedSwitch from '@components/input/ThemedSwitch'
 import { AppSettings } from '@lib/constants/GlobalValues'
+import { t } from '@lib/i18n'
 import { TagHider } from '@lib/state/TagHider'
 
 const TagHiderSettings = () => {
@@ -19,8 +20,8 @@ const TagHiderSettings = () => {
     return (
         <View>
             <ThemedSwitch
-                label="Hidden Tags"
-                description="Hide characters with the following tags from the character list."
+                label={t('Hidden Tags')}
+                description={t('Hide characters with the following tags from the character list.')}
                 value={tagHider}
                 onChangeValue={(b) => setUseTagHider(b)}
             />
