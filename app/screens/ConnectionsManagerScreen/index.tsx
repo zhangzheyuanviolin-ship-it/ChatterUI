@@ -8,6 +8,7 @@ import ThemedButton from '@components/buttons/ThemedButton'
 import HeaderButton from '@components/views/HeaderButton'
 import HeaderTitle from '@components/views/HeaderTitle'
 import { APIManager } from '@lib/engine/API/APIManagerState'
+import { t } from '@lib/i18n'
 import { Theme } from '@lib/theme/ThemeManager'
 
 import ConnectionItem from './ConnectionItem'
@@ -36,8 +37,8 @@ const ConnectionsManagerScreen = () => {
                 headerRight={() => (
                     <Pressable
                         accessibilityRole="button"
-                        accessibilityLabel="Template manager"
-                        accessibilityHint="Opens API template list"
+                        accessibilityLabel={t('Template manager')}
+                        accessibilityHint={t('Opens API template list')}
                         onPress={() => {
                             router.push('/screens/ConnectionsManagerScreen/TemplateManager')
                         }}>
@@ -68,7 +69,7 @@ const ConnectionsManagerScreen = () => {
                             fontStyle: 'italic',
                             marginTop: spacing.l,
                         }}>
-                        No Connections Added
+                        {t('No Connections Added')}
                     </Text>
                 </View>
             )}

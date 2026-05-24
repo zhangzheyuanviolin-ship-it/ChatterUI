@@ -8,6 +8,7 @@ import ThemedButton from '@components/buttons/ThemedButton'
 import HeaderTitle from '@components/views/HeaderTitle'
 import { db } from '@db'
 import useLocalAuth from '@lib/hooks/LocalAuth'
+import { t } from '@lib/i18n'
 import { Theme } from '@lib/theme/ThemeManager'
 import { loadChatOnInit, startupApp, useTextIntentFocus } from '@lib/utils/Startup'
 import CharacterList from '@screens/CharacterListScreen'
@@ -77,14 +78,14 @@ const Home = () => {
                     style={{ marginBottom: 12 }}
                     color={color.text._500}
                 />
-                <Text style={styles.title}>Authentication Required</Text>
+                <Text style={styles.title}>{t('Authentication Required')}</Text>
                 <TouchableOpacity
                     accessible
                     accessibilityRole="button"
-                    accessibilityLabel="Retry authentication"
+                    accessibilityLabel={t('Retry authentication')}
                     onPress={retry}
                     style={styles.button}>
-                    <Text style={styles.buttonText}>Try Again</Text>
+                    <Text style={styles.buttonText}>{t('Try Again')}</Text>
                 </TouchableOpacity>
             </View>
         )

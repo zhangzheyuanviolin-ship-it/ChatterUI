@@ -11,6 +11,7 @@ import {
 } from 'react-native'
 
 import TText from '@components/text/TText'
+import { t } from '@lib/i18n'
 import { Theme } from '@lib/theme/ThemeManager'
 import { firstDefined, normalizeA11yLabel } from '@lib/utils/A11y'
 
@@ -129,9 +130,11 @@ const ThemedButton: React.FC<ThemedButtonProps> = ({
 }) => {
     const animOpacity = useAnimatedValue(1)
     const theme = useButtonTheme(variant)
+    const translatedLabel = label ? t(label) : undefined
+    const accessibilityHint = rest.accessibilityHint ? t(rest.accessibilityHint) : undefined
     const accessibilityLabel = firstDefined(
-        normalizeA11yLabel(rest.accessibilityLabel),
-        normalizeA11yLabel(label),
+        normalizeA11yLabel(rest.accessibilityLabel ? t(rest.accessibilityLabel) : undefined),
+        normalizeA11yLabel(translatedLabel),
         normalizeA11yLabel(iconName)
     )
 
@@ -149,6 +152,7 @@ const ThemedButton: React.FC<ThemedButtonProps> = ({
 
     return (
         <AnimatedPressable
+            {...rest}
             disabled={variant === 'disabled'}
             accessible={rest.accessible ?? true}
             accessibilityRole={rest.accessibilityRole ?? 'button'}
@@ -157,6 +161,7 @@ const ThemedButton: React.FC<ThemedButtonProps> = ({
                 disabled: Boolean(variant === 'disabled' || rest.disabled),
             }}
             accessibilityLabel={accessibilityLabel}
+            accessibilityHint={accessibilityHint}
             onPressIn={(event) => {
                 handlePressIn()
                 if (onPressIn) onPressIn(event)
@@ -165,7 +170,6 @@ const ThemedButton: React.FC<ThemedButtonProps> = ({
                 handlePressOut()
                 if (onPressOut) onPressOut(event)
             }}
-            {...rest}
             style={StyleSheet.flatten([
                 theme.buttonStyle,
                 {
@@ -195,7 +199,9 @@ const ThemedButton: React.FC<ThemedButtonProps> = ({
                     />
                 ))}
             {icon}
-            {label && <TText style={[theme.labelStyle, labelStyle]}>{label}</TText>}
+            {translatedLabel && (
+                <TText style={[theme.labelStyle, labelStyle]}>{translatedLabel}</TText>
+            )}
         </AnimatedPressable>
     )
 }

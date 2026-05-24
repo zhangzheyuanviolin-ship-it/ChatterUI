@@ -1,8 +1,25 @@
-const IS_DEV = process.env.APP_VARIANT === 'development'
+const APP_VARIANT = process.env.APP_VARIANT ?? 'production'
+
+const VARIANT_CONFIG = {
+    production: {
+        name: 'ChatterUI',
+        identifier: 'com.Vali98.ChatterUI',
+    },
+    development: {
+        name: 'ChatterUI (DEV)',
+        identifier: 'com.Vali98.ChatterUIDev',
+    },
+    shipit: {
+        name: 'ChatterUI Next',
+        identifier: 'com.zhangzheyuan.chatterui.next',
+    },
+}
+
+const selectedVariant = VARIANT_CONFIG[APP_VARIANT] ?? VARIANT_CONFIG.production
 
 module.exports = {
     expo: {
-        name: IS_DEV ? 'ChatterUI (DEV)' : 'ChatterUI',
+        name: selectedVariant.name,
         newArchEnabled: true,
         slug: 'ChatterUI',
         version: '0.9.0',
@@ -18,8 +35,8 @@ module.exports = {
                 tinted: './assets/images/icon.png',
             },
             supportsTablet: true,
-            package: IS_DEV ? 'com.Vali98.ChatterUIDev' : 'com.Vali98.ChatterUI',
-            bundleIdentifier: IS_DEV ? 'com.Vali98.ChatterUIDev' : 'com.Vali98.ChatterUI',
+            package: selectedVariant.identifier,
+            bundleIdentifier: selectedVariant.identifier,
         },
         android: {
             adaptiveIcon: {
@@ -29,7 +46,7 @@ module.exports = {
                 backgroundColor: '#000',
             },
             edgeToEdgeEnabled: true,
-            package: IS_DEV ? 'com.Vali98.ChatterUIDev' : 'com.Vali98.ChatterUI',
+            package: selectedVariant.identifier,
             userInterfaceStyle: 'dark',
             permissions: [
                 'android.permission.FOREGROUND_SERVICE',

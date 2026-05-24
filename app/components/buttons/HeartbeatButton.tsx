@@ -1,6 +1,7 @@
 import React, { useCallback, useEffect, useState } from 'react'
 import { Text, View } from 'react-native'
 
+import { t } from '@lib/i18n'
 import { Theme } from '@lib/theme/ThemeManager'
 
 import ThemedButton from './ThemedButton'
@@ -43,11 +44,11 @@ const HeartbeatButton: React.FC<HeartbeatButtonProps> = ({
     const StatusMessage = () => {
         switch (status) {
             case ResponseStatus.DEFAULT:
-                return messageNeutral
+                return t(messageNeutral)
             case ResponseStatus.ERROR:
-                return messageError
+                return t(messageError)
             case ResponseStatus.OK:
-                return messageOK
+                return t(messageOK)
         }
     }
 

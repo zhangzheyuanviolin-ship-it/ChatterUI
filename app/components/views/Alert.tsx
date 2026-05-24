@@ -3,6 +3,7 @@ import Animated, { FadeInDown } from 'react-native-reanimated'
 import { useShallow } from 'zustand/react/shallow'
 
 import FadeBackrop from '@components/views/FadeBackdrop'
+import { t } from '@lib/i18n'
 import { AlertButtonProps, AlertProps, useAlertStore } from '@lib/state/components/Alert'
 import { Theme } from '@lib/theme/ThemeManager'
 import { normalizeA11yLabel } from '@lib/utils/A11y'
@@ -17,6 +18,7 @@ export default Alert
 
 const AlertButton: React.FC<AlertButtonProps> = ({ label, onPress, type = 'default' }) => {
     const styles = useStyles()
+    const translatedLabel = t(label)
     const buttonStyleMap = {
         warning: styles.buttonWarning,
         default: styles.button,
@@ -26,12 +28,12 @@ const AlertButton: React.FC<AlertButtonProps> = ({ label, onPress, type = 'defau
         <TouchableOpacity
             accessible
             accessibilityRole="button"
-            accessibilityLabel={normalizeA11yLabel(label) ?? 'Alert action'}
+            accessibilityLabel={normalizeA11yLabel(translatedLabel) ?? t('Alert action')}
             onPress={async () => {
                 useAlertStore.getState().hide()
                 onPress && onPress()
             }}>
-            <Text style={buttonStyleMap[type]}>{label}</Text>
+            <Text style={buttonStyleMap[type]}>{translatedLabel}</Text>
         </TouchableOpacity>
     )
 }
@@ -49,6 +51,8 @@ export const AlertProvider = () => {
         hide()
     }
     const hide = useAlertStore((state) => state.hide)
+    const translatedTitle = props.title ? t(props.title) : undefined
+    const translatedDescription = props.description ? t(props.description) : undefined
 
     return (
         <Modal
@@ -64,10 +68,10 @@ export const AlertProvider = () => {
                 <View
                     accessible
                     accessibilityViewIsModal
-                    accessibilityLabel={normalizeA11yLabel(props.title) ?? 'Alert dialog'}
+                    accessibilityLabel={normalizeA11yLabel(translatedTitle) ?? t('Alert dialog')}
                     style={styles.textBox}>
-                    <Text style={styles.title}>{props.title}</Text>
-                    <Text style={styles.description}>{props.description}</Text>
+                    <Text style={styles.title}>{translatedTitle}</Text>
+                    <Text style={styles.description}>{translatedDescription}</Text>
                     <View style={styles.buttonContainer}>
                         {props.buttons.map((item, index) => (
                             <AlertButton {...item} key={index} />

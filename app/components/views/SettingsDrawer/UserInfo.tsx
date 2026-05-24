@@ -3,6 +3,7 @@ import { Text, TouchableOpacity } from 'react-native'
 import { useShallow } from 'zustand/react/shallow'
 
 import Avatar from '@components/views/Avatar'
+import { t } from '@lib/i18n'
 import { Characters } from '@lib/state/Characters'
 import { Theme } from '@lib/theme/ThemeManager'
 
@@ -20,6 +21,10 @@ const UserInfo = () => {
             onPress={() => {
                 router.push('/screens/UserManagerScreen')
             }}
+            accessible
+            accessibilityRole="button"
+            accessibilityLabel={userName ?? t('User')}
+            accessibilityHint={t('Open user manager')}
             style={{
                 alignItems: 'center',
                 columnGap: spacing.l,

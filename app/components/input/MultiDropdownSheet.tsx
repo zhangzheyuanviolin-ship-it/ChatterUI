@@ -3,6 +3,7 @@ import { useState } from 'react'
 import { FlatList, Pressable, StyleSheet, Text, TextInput, View, ViewStyle } from 'react-native'
 
 import BottomSheet from '@components/views/BottomSheet'
+import { t } from '@lib/i18n'
 import { Theme } from '@lib/theme/ThemeManager'
 import { normalizeA11yLabel } from '@lib/utils/A11y'
 
@@ -60,6 +61,8 @@ const MultiDropdownSheet = <T,>({
     const { color, spacing } = Theme.useTheme()
     const [showList, setShowList] = useState(false)
     const [searchFilter, setSearchFilter] = useState('')
+    const translatedPlaceholder = t(placeholder)
+    const translatedModalTitle = t(modalTitle)
 
     const items = data.filter((item) =>
         labelExtractor(item)
@@ -80,11 +83,16 @@ const MultiDropdownSheet = <T,>({
                         flexDirection: 'row',
                         justifyContent: 'space-between',
                     }}>
-                    <Text style={styles.modalTitle}>{modalTitle}</Text>
+                    <Text style={styles.modalTitle}>{translatedModalTitle}</Text>
                     <Text style={styles.counterText}>
                         {selected.length > 0
-                            ? `Selected ${selected.length} item${selected.length > 1 ? 's' : ''}`
-                            : 'No items selected'}
+                            ? t(
+                                  selected.length > 1
+                                      ? 'Selected {count} items'
+                                      : 'Selected {count} item',
+                                  { count: selected.length }
+                              )
+                            : t('No items selected')}
                     </Text>
                 </View>
                 {items.length > 0 ? (
@@ -122,13 +130,13 @@ const MultiDropdownSheet = <T,>({
                         )}
                     />
                 ) : (
-                    <Text style={styles.emptyText}>No Items</Text>
+                    <Text style={styles.emptyText}>{t('No Items')}</Text>
                 )}
                 {search && (
                     <TextInput
                         accessible
-                        accessibilityLabel={`${modalTitle} filter`}
-                        placeholder="Filter..."
+                        accessibilityLabel={`${translatedModalTitle} ${t('Filter')}`}
+                        placeholder={t('Filter...')}
                         placeholderTextColor={color.text._300}
                         style={styles.searchBar}
                         value={searchFilter}
@@ -139,15 +147,17 @@ const MultiDropdownSheet = <T,>({
             <Pressable
                 accessible
                 accessibilityRole="button"
-                accessibilityLabel={normalizeA11yLabel(modalTitle)}
-                accessibilityHint="Opens multi-select list"
+                accessibilityLabel={normalizeA11yLabel(translatedModalTitle)}
+                accessibilityHint={t('Opens multi-select list')}
                 style={[style, styles.button]}
                 onPress={() => setShowList(true)}>
                 {selected && selected.length > 0 && (
-                    <Text style={styles.buttonText}>{selected.length} Items Selected</Text>
+                    <Text style={styles.buttonText}>
+                        {t('{count} Items Selected', { count: selected.length })}
+                    </Text>
                 )}
                 {(!selected || selected.length === 0) && (
-                    <Text style={styles.placeholderText}>{placeholder}</Text>
+                    <Text style={styles.placeholderText}>{translatedPlaceholder}</Text>
                 )}
                 <Entypo name="chevron-down" color={color.primary._800} size={18} />
             </Pressable>

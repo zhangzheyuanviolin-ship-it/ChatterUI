@@ -2,6 +2,7 @@ import { Octicons } from '@expo/vector-icons'
 import { TouchableOpacity, View } from 'react-native'
 import Animated, { ZoomIn, ZoomOut } from 'react-native-reanimated'
 
+import { t } from '@lib/i18n'
 import { Chats, useInference } from '@lib/state/Chat'
 import { Logger } from '@lib/state/Logger'
 import { useTTS } from '@lib/state/TTS'
@@ -35,7 +36,7 @@ const ChatTTS: React.FC<TTSProps> = ({ index }) => {
                         <TouchableOpacity
                             accessible
                             accessibilityRole="button"
-                            accessibilityLabel="Stop text to speech"
+                            accessibilityLabel={t('Stop text to speech')}
                             onPress={handleStopSpeaking}>
                             <Octicons name="mute" size={24} color={color.error._500} />
                         </TouchableOpacity>
@@ -46,7 +47,7 @@ const ChatTTS: React.FC<TTSProps> = ({ index }) => {
                         <TouchableOpacity
                             accessible
                             accessibilityRole="button"
-                            accessibilityLabel="Speak message"
+                            accessibilityLabel={t('Speak message')}
                             onPress={handleSpeak}
                             disabled={nowGenerating}>
                             <Octicons

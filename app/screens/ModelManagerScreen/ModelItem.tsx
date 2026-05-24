@@ -9,6 +9,7 @@ import InputSheet from '@components/views/InputSheet'
 import { GGMLNameMap } from '@lib/engine/Local'
 import { Llama } from '@lib/engine/Local/LlamaLocal'
 import { Model, ModelListQueryType } from '@lib/engine/Local/Model'
+import { t } from '@lib/i18n'
 import { Logger } from '@lib/state/Logger'
 import { Theme } from '@lib/theme/ThemeManager'
 import { readableFileSize } from '@lib/utils/File'
@@ -135,7 +136,9 @@ const ModelItem: React.FC<ModelItemProps> = ({
                         accessible
                         accessibilityRole="button"
                         accessibilityLabel={
-                            item.mmprojLink ? 'Unlink vision model' : 'Link vision model'
+                            item.mmprojLink
+                                ? t('Unlink vision model')
+                                : t('Link vision model')
                         }
                         style={styles.button}
                         onPress={async () => {
@@ -175,7 +178,7 @@ const ModelItem: React.FC<ModelItemProps> = ({
                     disabled={disableEdit}
                     accessible
                     accessibilityRole="button"
-                    accessibilityLabel={`Rename model ${item.name}`}
+                    accessibilityLabel={t('Rename model {name}', { name: item.name })}
                     style={styles.button}
                     onPress={() => {
                         setShowEdit(true)
@@ -190,7 +193,7 @@ const ModelItem: React.FC<ModelItemProps> = ({
                     disabled={disableDelete}
                     accessible
                     accessibilityRole="button"
-                    accessibilityLabel={`Delete model ${item.name}`}
+                    accessibilityLabel={t('Delete model {name}', { name: item.name })}
                     style={styles.button}
                     onPress={() => {
                         handleDeleteModel()
@@ -207,7 +210,11 @@ const ModelItem: React.FC<ModelItemProps> = ({
                         disabled={loadToggle}
                         accessible
                         accessibilityRole="button"
-                        accessibilityLabel={isLoaded ? `Unload model ${item.name}` : `Load model ${item.name}`}
+                        accessibilityLabel={
+                            isLoaded
+                                ? t('Unload model {name}', { name: item.name })
+                                : t('Load model {name}', { name: item.name })
+                        }
                         style={styles.button}
                         onPress={async () => {
                             if (isLoaded) {

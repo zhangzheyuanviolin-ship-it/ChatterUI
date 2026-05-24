@@ -22,6 +22,7 @@ import { XAxisOnlyTransition } from '@lib/animations/transitions'
 import { AppSettings } from '@lib/constants/GlobalValues'
 import { generateResponse } from '@lib/engine/Inference'
 import { useUnfocusTextInput } from '@lib/hooks/UnfocusTextInput'
+import { t } from '@lib/i18n'
 import { Characters } from '@lib/state/Characters'
 import { Chats, useInference } from '@lib/state/Chat'
 import { useChatInputTextStore } from '@lib/state/components/ChatInput'
@@ -179,7 +180,9 @@ const ChatInput = () => {
                             <ThemedButton
                                 iconName="close"
                                 iconSize={20}
-                                accessibilityLabel={`Remove attachment ${item.name}`}
+                                accessibilityLabel={t('Remove attachment {name}', {
+                                    name: item.name,
+                                })}
                                 accessibilityHint="Deletes this attachment from the message"
                                 buttonStyle={{
                                     borderWidth: 0,
@@ -288,8 +291,8 @@ const ChatInput = () => {
                     ref={inputRef}
                     accessible
                     accessibilityRole="text"
-                    accessibilityLabel="Message input"
-                    accessibilityHint="Double tap to type your message"
+                    accessibilityLabel={t('Message input')}
+                    accessibilityHint={t('Double tap to type your message')}
                     style={{
                         color: color.text._100,
                         backgroundColor: color.neutral._100,
@@ -304,7 +307,7 @@ const ChatInput = () => {
                         setHideOptions(!!newMessage)
                     }}
                     numberOfLines={8}
-                    placeholder="Message..."
+                    placeholder={t('Message...')}
                     placeholderTextColor={color.text._700}
                     value={newMessage}
                     onChangeText={(text) => {

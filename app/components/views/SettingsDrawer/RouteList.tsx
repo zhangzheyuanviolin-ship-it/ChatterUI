@@ -4,6 +4,7 @@ import { FlatList, StyleSheet, Text, TouchableOpacity } from 'react-native'
 import { useMMKVBoolean } from 'react-native-mmkv'
 import Animated, { Easing, SlideInLeft } from 'react-native-reanimated'
 
+import { t } from '@lib/i18n'
 import { AppSettings } from '@lib/constants/GlobalValues'
 import { useAppMode } from '@lib/state/AppMode'
 import { Theme } from '@lib/theme/ThemeManager'
@@ -33,9 +34,12 @@ const DrawerButton = ({ item, index }: DrawerButtonProps) => {
                 style={styles.largeButton}
                 onPress={() => {
                     router.push(item.path)
-                }}>
+                }}
+                accessible
+                accessibilityRole="button"
+                accessibilityLabel={t(item.name)}>
                 <AntDesign size={24} name={item.icon ?? 'question'} color={color.text._400} />
-                <Text style={styles.largeButtonText}>{item.name}</Text>
+                <Text style={styles.largeButtonText}>{t(item.name)}</Text>
             </TouchableOpacity>
         </Animated.View>
     )

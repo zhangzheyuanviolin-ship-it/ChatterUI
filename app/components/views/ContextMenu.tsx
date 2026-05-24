@@ -31,6 +31,7 @@ import {
     ShrinkHeightOut,
     ShrinkHeightUpOut,
 } from '@lib/animations/transitions'
+import { t } from '@lib/i18n'
 import { useContextMenuStore } from '@lib/state/components/ContextMenu'
 import { Theme } from '@lib/theme/ThemeManager'
 import { normalizeA11yLabel } from '@lib/utils/A11y'
@@ -97,6 +98,8 @@ const ContextMenu: React.FC<ContextMenuProps> = ({
     )
 
     const [anchor, setAnchor] = useState<LayoutRectangle | null>(null)
+    const translatedTriggerLabel = triggerLabel ? t(triggerLabel) : undefined
+    const translatedTriggerHint = triggerHint ? t(triggerHint) : undefined
 
     const handleOpen = (event: GestureResponderEvent) => {
         const ne = event.nativeEvent
@@ -135,11 +138,11 @@ const ContextMenu: React.FC<ContextMenuProps> = ({
                 accessible
                 accessibilityRole="button"
                 accessibilityLabel={
-                    normalizeA11yLabel(triggerLabel) ??
+                    normalizeA11yLabel(translatedTriggerLabel) ??
                     normalizeA11yLabel(triggerIcon) ??
-                    'Open menu'
+                    t('Open menu')
                 }
-                accessibilityHint={normalizeA11yLabel(triggerHint)}
+                accessibilityHint={normalizeA11yLabel(translatedTriggerHint)}
                 activeOpacity={0.5}
                 style={{ opacity: isOpen ? 0.5 : 1 }}
                 ref={triggerRef}
@@ -338,7 +341,9 @@ const MenuList = ({
                             <Pressable
                                 accessible
                                 accessibilityRole="button"
-                                accessibilityLabel={normalizeA11yLabel(item.label) ?? 'Menu option'}
+                                accessibilityLabel={
+                                    normalizeA11yLabel(t(item.label)) ?? t('Menu option')
+                                }
                                 style={styles.menuItem}
                                 onPress={() => {
                                     if (hasSubmenu) {
@@ -373,7 +378,7 @@ const MenuList = ({
                                             ? styles.menuTextError
                                             : styles.menuText
                                     }>
-                                    {item.label}
+                                    {t(item.label)}
                                 </Text>
                             </Pressable>
 

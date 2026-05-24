@@ -1,6 +1,7 @@
 import React, { ReactNode } from 'react'
 import { TextProps, TextStyle } from 'react-native'
 
+import { t } from '@lib/i18n'
 import { Theme } from '@lib/theme/ThemeManager'
 
 import TText from './TText'
@@ -17,6 +18,7 @@ const SectionTitle = ({
     visible?: boolean
 }) => {
     const { color, spacing } = Theme.useTheme()
+    const translatedChildren = typeof children === 'string' ? t(children) : children
     if (visible)
         return (
             <TText
@@ -29,7 +31,7 @@ const SectionTitle = ({
                     borderColor: color.neutral._500,
                     ...style,
                 }}>
-                {children}
+                {translatedChildren}
             </TText>
         )
 }

@@ -8,6 +8,7 @@ import Animated, {
     withTiming,
 } from 'react-native-reanimated'
 
+import { t } from '@lib/i18n'
 import { Theme } from '@lib/theme/ThemeManager'
 
 type HorizontalSelectorProps<T> = {
@@ -34,6 +35,8 @@ const HorizontalSelector = <T,>({
     style,
 }: HorizontalSelectorProps<T>) => {
     const { color, spacing, fontSize } = Theme.useTheme()
+    const translatedLabel = label ? t(label) : undefined
+    const translatedDescription = description ? t(description) : undefined
     const viewRef = useRef<View>(null)
     const initialRender = useRef(true)
     const animatedValues = useSharedValue({
@@ -64,13 +67,13 @@ const HorizontalSelector = <T,>({
 
     return (
         <View style={[{ flex: 1 }, style]}>
-            {label && (
+            {translatedLabel && (
                 <Text
                     style={{
                         flex: style?.flex ?? 1,
                         color: color.text._100,
                     }}>
-                    {label}
+                    {translatedLabel}
                 </Text>
             )}
 
@@ -123,14 +126,14 @@ const HorizontalSelector = <T,>({
                                     color: color.text[isSelected ? '_200' : '_500'],
                                     fontSize: fontSize.s,
                                 }}>
-                                {item.label}
+                                {t(item.label)}
                             </Text>
                         </Pressable>
                     )
                 })}
             </View>
 
-            {description && (
+            {translatedDescription && (
                 <Text
                     style={{
                         color: color.text._400,
@@ -138,7 +141,7 @@ const HorizontalSelector = <T,>({
                         paddingBottom: spacing.xs,
                         marginBottom: spacing.m,
                     }}>
-                    {description}
+                    {translatedDescription}
                 </Text>
             )}
         </View>

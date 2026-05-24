@@ -3,6 +3,7 @@ import React from 'react'
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native'
 
 import { continueResponse, generateResponse, regenerateResponse } from '@lib/engine/Inference'
+import { t } from '@lib/i18n'
 import { Chats } from '@lib/state/Chat'
 import { Theme } from '@lib/theme/ThemeManager'
 
@@ -40,7 +41,7 @@ const ChatSwipes: React.FC<SwipesProps> = ({ nowGenerating, isGreeting, index })
             <TouchableOpacity
                 accessible
                 accessibilityRole="button"
-                accessibilityLabel="Previous swipe"
+                accessibilityLabel={t('Previous swipe')}
                 style={styles.swipeButton}
                 onPress={handleSwipeLeft}
                 disabled={nowGenerating || swipeIndex === 0}>
@@ -55,7 +56,7 @@ const ChatSwipes: React.FC<SwipesProps> = ({ nowGenerating, isGreeting, index })
                 <TouchableOpacity
                     accessible
                     accessibilityRole="button"
-                    accessibilityLabel="Regenerate response"
+                    accessibilityLabel={t('Regenerate response')}
                     onPress={() => swipeId && regenerateResponse(swipeId)}
                     onLongPress={() => swipeId && regenerateResponse(swipeId, false)}
                     disabled={nowGenerating}
@@ -76,7 +77,7 @@ const ChatSwipes: React.FC<SwipesProps> = ({ nowGenerating, isGreeting, index })
                 <TouchableOpacity
                     accessible
                     accessibilityRole="button"
-                    accessibilityLabel="Continue response"
+                    accessibilityLabel={t('Continue response')}
                     onPress={() => swipeId && continueResponse(swipeId)}
                     disabled={nowGenerating}
                     style={styles.swipeButton}>
@@ -91,7 +92,7 @@ const ChatSwipes: React.FC<SwipesProps> = ({ nowGenerating, isGreeting, index })
             <TouchableOpacity
                 accessible
                 accessibilityRole="button"
-                accessibilityLabel="Next swipe"
+                accessibilityLabel={t('Next swipe')}
                 style={styles.swipeButton}
                 onPress={() => handleSwipeRight('')}
                 onLongPress={() => handleSwipeRight(swipeText ?? '')}
