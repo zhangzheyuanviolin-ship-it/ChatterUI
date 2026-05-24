@@ -2,6 +2,7 @@ import React from 'react'
 import { Switch, Text, View } from 'react-native'
 
 import { Theme } from '@lib/theme/ThemeManager'
+import { firstDefined, normalizeA11yLabel } from '@lib/utils/A11y'
 
 interface ThemedSwitchProps {
     description?: string
@@ -17,11 +18,21 @@ const ThemedSwitch: React.FC<ThemedSwitchProps> = ({
     onChangeValue,
 }) => {
     const { color, spacing } = Theme.useTheme()
+    const accessibilityLabel = firstDefined(
+        normalizeA11yLabel(label),
+        normalizeA11yLabel(description),
+        'Switch'
+    )
+
     return (
         <View>
             <View
                 style={{ flexDirection: 'row', paddingVertical: spacing.m, alignItems: 'center' }}>
                 <Switch
+                    accessible
+                    accessibilityRole="switch"
+                    accessibilityLabel={accessibilityLabel}
+                    accessibilityState={{ checked: !!value }}
                     trackColor={{
                         false: color.neutral._300,
                         true: color.neutral._500,

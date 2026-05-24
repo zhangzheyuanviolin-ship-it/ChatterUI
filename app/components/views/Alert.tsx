@@ -5,6 +5,7 @@ import { useShallow } from 'zustand/react/shallow'
 import FadeBackrop from '@components/views/FadeBackdrop'
 import { AlertButtonProps, AlertProps, useAlertStore } from '@lib/state/components/Alert'
 import { Theme } from '@lib/theme/ThemeManager'
+import { normalizeA11yLabel } from '@lib/utils/A11y'
 
 namespace Alert {
     export const alert = (props: AlertProps) => {
@@ -23,6 +24,9 @@ const AlertButton: React.FC<AlertButtonProps> = ({ label, onPress, type = 'defau
 
     return (
         <TouchableOpacity
+            accessible
+            accessibilityRole="button"
+            accessibilityLabel={normalizeA11yLabel(label) ?? 'Alert action'}
             onPress={async () => {
                 useAlertStore.getState().hide()
                 onPress && onPress()
@@ -57,7 +61,11 @@ export const AlertProvider = () => {
             onRequestClose={handleDismiss}>
             <FadeBackrop handleOverlayClick={handleDismiss} />
             <Animated.View style={styles.textBoxContainer} entering={FadeInDown.duration(150)}>
-                <View style={styles.textBox}>
+                <View
+                    accessible
+                    accessibilityViewIsModal
+                    accessibilityLabel={normalizeA11yLabel(props.title) ?? 'Alert dialog'}
+                    style={styles.textBox}>
                     <Text style={styles.title}>{props.title}</Text>
                     <Text style={styles.description}>{props.description}</Text>
                     <View style={styles.buttonContainer}>

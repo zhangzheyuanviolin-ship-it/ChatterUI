@@ -4,6 +4,7 @@ import { FlatList, Pressable, Text, TextInput, View, ViewStyle } from 'react-nat
 
 import BottomSheet from '@components/views/BottomSheet'
 import { Theme } from '@lib/theme/ThemeManager'
+import { normalizeA11yLabel } from '@lib/utils/A11y'
 
 import { useDropdownStyles } from './MultiDropdownSheet'
 
@@ -58,6 +59,11 @@ const DropdownSheet = <T,>({
                         keyExtractor={(item, index) => index.toString()}
                         renderItem={({ item }) => (
                             <Pressable
+                                accessible
+                                accessibilityRole="button"
+                                accessibilityLabel={normalizeA11yLabel(
+                                    `Select ${labelExtractor(item)}`
+                                )}
                                 style={
                                     selected && labelExtractor(item) === labelExtractor(selected)
                                         ? styles.listItemSelected
@@ -76,6 +82,8 @@ const DropdownSheet = <T,>({
                 )}
                 {search && (
                     <TextInput
+                        accessible
+                        accessibilityLabel={`${modalTitle} filter`}
                         placeholder="Filter..."
                         placeholderTextColor={theme.color.text._300}
                         style={styles.searchBar}
@@ -84,7 +92,13 @@ const DropdownSheet = <T,>({
                     />
                 )}
             </BottomSheet>
-            <Pressable style={[style, styles.button]} onPress={() => setShowList(true)}>
+            <Pressable
+                accessible
+                accessibilityRole="button"
+                accessibilityLabel={normalizeA11yLabel(modalTitle)}
+                accessibilityHint="Opens selection list"
+                style={[style, styles.button]}
+                onPress={() => setShowList(true)}>
                 {selected && <Text style={styles.buttonText}>{labelExtractor(selected)}</Text>}
                 {!selected && <Text style={styles.placeholderText}>{placeholder}</Text>}
                 <Entypo name="chevron-down" color={theme.color.primary._800} size={18} />

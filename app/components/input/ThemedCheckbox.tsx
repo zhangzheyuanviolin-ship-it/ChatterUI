@@ -12,6 +12,7 @@ import Animated, {
 } from 'react-native-reanimated'
 
 import { Theme } from '@lib/theme/ThemeManager'
+import { firstDefined, normalizeA11yLabel } from '@lib/utils/A11y'
 
 type ThemedCheckboxProps = {
     label?: string
@@ -28,6 +29,7 @@ const ThemedCheckbox: React.FC<ThemedCheckboxProps> = ({
 }) => {
     const theme = Theme.useTheme()
     const colorChange = useSharedValue(value ? 1 : 0)
+    const accessibilityLabel = firstDefined(normalizeA11yLabel(label), 'Checkbox')
 
     const color1 = theme.color.neutral._100
     const color2 = theme.color.primary._500
@@ -45,6 +47,10 @@ const ThemedCheckbox: React.FC<ThemedCheckboxProps> = ({
 
     return (
         <Pressable
+            accessible
+            accessibilityRole="checkbox"
+            accessibilityLabel={accessibilityLabel}
+            accessibilityState={{ checked: value }}
             style={{ flexDirection: 'row', alignItems: 'center' }}
             onPress={() => {
                 onChangeValue(!value)

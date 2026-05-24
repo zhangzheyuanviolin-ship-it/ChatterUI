@@ -32,14 +32,23 @@ const ChatTTS: React.FC<TTSProps> = ({ index }) => {
             <View>
                 {isSpeaking && (
                     <Animated.View entering={ZoomIn.duration(200)} exiting={ZoomOut.duration(200)}>
-                        <TouchableOpacity onPress={handleStopSpeaking}>
+                        <TouchableOpacity
+                            accessible
+                            accessibilityRole="button"
+                            accessibilityLabel="Stop text to speech"
+                            onPress={handleStopSpeaking}>
                             <Octicons name="mute" size={24} color={color.error._500} />
                         </TouchableOpacity>
                     </Animated.View>
                 )}
                 {!isSpeaking && (
                     <Animated.View entering={ZoomIn.duration(200)} exiting={ZoomOut.duration(200)}>
-                        <TouchableOpacity onPress={handleSpeak} disabled={nowGenerating}>
+                        <TouchableOpacity
+                            accessible
+                            accessibilityRole="button"
+                            accessibilityLabel="Speak message"
+                            onPress={handleSpeak}
+                            disabled={nowGenerating}>
                             <Octicons
                                 name="unmute"
                                 size={24}

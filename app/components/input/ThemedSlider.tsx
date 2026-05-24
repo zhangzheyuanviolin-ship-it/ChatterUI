@@ -3,6 +3,7 @@ import { useCallback, useState } from 'react'
 import { StyleSheet, Text, TextInput, View } from 'react-native'
 
 import { Theme } from '@lib/theme/ThemeManager'
+import { normalizeA11yLabel } from '@lib/utils/A11y'
 
 type ThemedSliderProps = {
     label: string
@@ -32,6 +33,7 @@ const ThemedSlider: React.FC<ThemedSliderProps> = ({
 }) => {
     const styles = useStyles()
     const { color } = Theme.useTheme()
+    const sliderLabel = normalizeA11yLabel(label) ?? 'Slider'
     const [textValue, setTextValue] = useState(value.toString())
 
     const clampSlider = useCallback(
@@ -65,6 +67,15 @@ const ThemedSlider: React.FC<ThemedSliderProps> = ({
             <View style={styles.sliderContainer}>
                 <Slider
                     disabled={disabled}
+                    accessible
+                    accessibilityRole="adjustable"
+                    accessibilityLabel={sliderLabel}
+                    accessibilityValue={{
+                        min,
+                        max,
+                        now: value,
+                        text: value.toString(),
+                    }}
                     style={styles.slider}
                     step={step}
                     minimumValue={min}
@@ -78,6 +89,8 @@ const ThemedSlider: React.FC<ThemedSliderProps> = ({
                 {showInput && (
                     <TextInput
                         editable={!disabled}
+                        accessible
+                        accessibilityLabel={`${sliderLabel} value`}
                         style={disabled ? styles.textBoxDisabled : styles.textBox}
                         value={textValue}
                         onChangeText={handleTextInputChange}

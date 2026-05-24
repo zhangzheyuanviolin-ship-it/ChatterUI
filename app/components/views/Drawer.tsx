@@ -20,6 +20,7 @@ import { useShallow } from 'zustand/react/shallow'
 
 import ThemedButton, { ThemedButtonProps } from '@components/buttons/ThemedButton'
 import { Theme } from '@lib/theme/ThemeManager'
+import { normalizeA11yLabel } from '@lib/utils/A11y'
 
 import FadeBackrop from './FadeBackdrop'
 
@@ -63,6 +64,16 @@ const DirectionToGestureMap: Record<Direction, number> = {
     right: 1,
     up: 4,
     down: 8,
+}
+
+const getDrawerAccessibilityLabel = (drawerId: Drawer.ID, shown: boolean) => {
+    if (drawerId === Drawer.ID.SETTINGS) {
+        return shown ? 'Close settings drawer' : 'Open settings drawer'
+    }
+    if (drawerId === Drawer.ID.CHATLIST) {
+        return shown ? 'Close chats drawer' : 'Open chats drawer'
+    }
+    return shown ? 'Close user list drawer' : 'Open user list drawer'
 }
 
 interface DrawerGestureProps extends Omit<ComponentProps<typeof GestureDetector>, 'gesture'> {
@@ -113,7 +124,10 @@ namespace Drawer {
 
         return (
             <View style={styles.absolute}>
-                <FadeBackrop handleOverlayClick={handleOverlayClick} />
+                <FadeBackrop
+                    handleOverlayClick={handleOverlayClick}
+                    accessibilityLabel={getDrawerAccessibilityLabel(drawerId, true)}
+                />
                 <Animated.View
                     style={{ ...styles.drawer, ...drawerStyle }}
                     entering={animationIn[direction]}
@@ -144,6 +158,10 @@ namespace Drawer {
                 }}
                 variant="tertiary"
                 iconName={show ? closeIcon : openIcon}
+                accessibilityLabel={normalizeA11yLabel(
+                    getDrawerAccessibilityLabel(drawerId, show)
+                )}
+                accessibilityHint="Toggles side panel"
                 {...rest}
             />
         )

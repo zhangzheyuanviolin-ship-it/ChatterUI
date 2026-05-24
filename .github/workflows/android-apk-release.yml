@@ -1,0 +1,101 @@
+name: Android APK Release
+
+on:
+  workflow_dispatch:
+    inputs:
+      build_type:
+        description: Build type
+        required: true
+        default: debug
+        type: choice
+        options:
+          - debug
+          - release
+  push:
+    branches:
+      - master
+    paths:
+      - app/**
+      - lib/**
+      - db/**
+      - package.json
+      - package-lock.json
+      - app.config.js
+      - expo-build-plugins/**
+      - .github/workflows/android-apk-release.yml
+
+jobs:
+  build-android:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    env:
+      CI: true
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Setup Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - name: Setup Android SDK
+        uses: android-actions/setup-android@v3
+
+      - name: Install Android SDK packages
+        run: |
+          yes | sdkmanager --licenses
+          sdkmanager "platform-tools" "platforms;android-35" "build-tools;35.0.0"
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Generate native Android project
+        run: npx expo prebuild --platform android
+
+      - name: Build APK
+        run: |
+          cd android
+          chmod +x ./gradlew
+          if [ "${{ github.event.inputs.build_type || 'debug' }}" = "release" ]; then
+            ./gradlew assembleRelease --no-daemon
+          else
+            ./gradlew assembleDebug --no-daemon
+          fi
+
+      - name: Resolve artifact path
+        id: artifact
+        run: |
+          if [ "${{ github.event.inputs.build_type || 'debug' }}" = "release" ]; then
+            APK_PATH="android/app/build/outputs/apk/release/app-release.apk"
+            APK_NAME="ChatterUI-release-${{ github.run_number }}.apk"
+            TAG_NAME="apk-release-${{ github.run_number }}"
+          else
+            APK_PATH="android/app/build/outputs/apk/debug/app-debug.apk"
+            APK_NAME="ChatterUI-debug-${{ github.run_number }}.apk"
+            TAG_NAME="apk-debug-${{ github.run_number }}"
+          fi
+          echo "apk_path=$APK_PATH" >> "$GITHUB_OUTPUT"
+          echo "apk_name=$APK_NAME" >> "$GITHUB_OUTPUT"
+          echo "tag_name=$TAG_NAME" >> "$GITHUB_OUTPUT"
+
+      - name: Upload workflow artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ steps.artifact.outputs.apk_name }}
+          path: ${{ steps.artifact.outputs.apk_path }}
+
+      - name: Create GitHub Release and upload APK
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ steps.artifact.outputs.tag_name }}
+          name: ${{ steps.artifact.outputs.tag_name }}
+          files: ${{ steps.artifact.outputs.apk_path }}

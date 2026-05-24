@@ -12,6 +12,7 @@ import {
 
 import TText from '@components/text/TText'
 import { Theme } from '@lib/theme/ThemeManager'
+import { firstDefined, normalizeA11yLabel } from '@lib/utils/A11y'
 
 type ButtonVariant = 'primary' | 'secondary' | 'tertiary' | 'critical' | 'disabled'
 
@@ -128,6 +129,12 @@ const ThemedButton: React.FC<ThemedButtonProps> = ({
 }) => {
     const animOpacity = useAnimatedValue(1)
     const theme = useButtonTheme(variant)
+    const accessibilityLabel = firstDefined(
+        normalizeA11yLabel(rest.accessibilityLabel),
+        normalizeA11yLabel(label),
+        normalizeA11yLabel(iconName)
+    )
+
     const handlePressIn = () => {
         animOpacity.setValue(0.4)
     }
@@ -143,6 +150,13 @@ const ThemedButton: React.FC<ThemedButtonProps> = ({
     return (
         <AnimatedPressable
             disabled={variant === 'disabled'}
+            accessible={rest.accessible ?? true}
+            accessibilityRole={rest.accessibilityRole ?? 'button'}
+            accessibilityState={{
+                ...rest.accessibilityState,
+                disabled: Boolean(variant === 'disabled' || rest.disabled),
+            }}
+            accessibilityLabel={accessibilityLabel}
             onPressIn={(event) => {
                 handlePressIn()
                 if (onPressIn) onPressIn(event)
