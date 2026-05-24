@@ -118,7 +118,7 @@ jobs:
 
       - name: Verify APK signature
         run: |
-          apksigner verify --print-certs android/app/build/outputs/apk/release/app-release.apk
+          "$ANDROID_HOME/build-tools/35.0.0/apksigner" verify --print-certs android/app/build/outputs/apk/release/app-release.apk
 
       - name: Resolve artifact metadata
         id: artifact
