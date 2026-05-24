@@ -62,7 +62,7 @@ jobs:
           KEY_PASSWORD: ${{ secrets.CHATTERUI_UPLOAD_KEY_PASSWORD }}
         run: |
           cat > android/keystore.properties <<EOF
-          storeFile=app/chatterui-next-upload.jks
+          storeFile=chatterui-next-upload.jks
           storePassword=$KEYSTORE_PASSWORD
           keyAlias=$KEY_ALIAS
           keyPassword=$KEY_PASSWORD
