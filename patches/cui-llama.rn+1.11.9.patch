@@ -1,0 +1,154 @@
+diff --git a/node_modules/cui-llama.rn/cpp/jsi/JSIHelpers.h b/node_modules/cui-llama.rn/cpp/jsi/JSIHelpers.h
+index cf5ec19..f24c381 100644
+--- a/node_modules/cui-llama.rn/cpp/jsi/JSIHelpers.h
++++ b/node_modules/cui-llama.rn/cpp/jsi/JSIHelpers.h
+@@ -44,7 +44,7 @@ namespace rnllama_jsi {
+             if (shouldSkip) continue;
+ 
+             const std::string value = lm_gguf_kv_to_str(ctx, i);
+-            info.setProperty(runtime, keyStr.c_str(), jsi::String::createFromUtf8(runtime, value));
++            setSafeStringProperty(runtime, info, keyStr, value);
+         }
+ 
+         lm_gguf_free(ctx);
+diff --git a/node_modules/cui-llama.rn/cpp/jsi/JSIUtils.h b/node_modules/cui-llama.rn/cpp/jsi/JSIUtils.h
+index b022b0f..99e780c 100644
+--- a/node_modules/cui-llama.rn/cpp/jsi/JSIUtils.h
++++ b/node_modules/cui-llama.rn/cpp/jsi/JSIUtils.h
+@@ -4,6 +4,9 @@
+ #include <functional>
+ #include <memory>
+ #include <string>
++#include <string_view>
++
++#include "unicode.h"
+ 
+ using namespace facebook;
+ 
+@@ -13,6 +16,40 @@ namespace rnllama_jsi {
+     using PromiseTask = std::function<PromiseResultGenerator()>;
+     using JsiFunctionPtr = std::shared_ptr<jsi::Function>;
+ 
++    inline std::string sanitizeUtf8Lossy(std::string_view input) {
++        std::string output;
++        output.reserve(input.size());
++
++        size_t offset = 0;
++        while (offset < input.size()) {
++            const auto parsed = common_parse_utf8_codepoint(input, offset);
++            if (parsed.status == utf8_parse_result::SUCCESS && parsed.bytes_consumed > 0) {
++                output.append(input.substr(offset, parsed.bytes_consumed));
++                offset += parsed.bytes_consumed;
++                continue;
++            }
++
++            output.append(common_unicode_cpt_to_utf8(0xFFFD));
++            offset += parsed.status == utf8_parse_result::INCOMPLETE ? input.size() - offset : 1;
++        }
++
++        return output;
++    }
++
++    inline jsi::String makeJsStringSafe(jsi::Runtime& runtime, const std::string& message) {
++        return jsi::String::createFromUtf8(runtime, sanitizeUtf8Lossy(message));
++    }
++
++    inline void setSafeStringProperty(
++        jsi::Runtime& runtime,
++        jsi::Object& object,
++        const std::string& key,
++        const std::string& value
++    ) {
++        const std::string safeKey = sanitizeUtf8Lossy(key);
++        object.setProperty(runtime, safeKey.c_str(), makeJsStringSafe(runtime, value));
++    }
++
+     jsi::Value createPromiseTask(
+         jsi::Runtime& runtime,
+         std::shared_ptr<react::CallInvoker> callInvoker,
+diff --git a/node_modules/cui-llama.rn/cpp/jsi/JSIUtils.cpp b/node_modules/cui-llama.rn/cpp/jsi/JSIUtils.cpp
+index 8435b5a..5258a3c 100644
+--- a/node_modules/cui-llama.rn/cpp/jsi/JSIUtils.cpp
++++ b/node_modules/cui-llama.rn/cpp/jsi/JSIUtils.cpp
+@@ -82,7 +82,7 @@ namespace rnllama_jsi {
+                                 return;
+                             }
+                             try {
+-                                callInvoker->invokeAsync([resolve, resultGenerator, runtimePtr, contextId, shouldTrack]() {
++                                callInvoker->invokeAsync([resolve, reject, resultGenerator, runtimePtr, contextId, shouldTrack]() {
+                                     if (TaskManager::getInstance().isShuttingDown()) {
+                                         TaskFinishGuard guard(contextId, shouldTrack);
+                                         return;
+@@ -90,7 +90,20 @@ namespace rnllama_jsi {
+                                     // Finish task AFTER the JS callback completes (when resultGenerator runs)
+                                     TaskFinishGuard guard(contextId, shouldTrack);
+                                     auto& rt = *runtimePtr;
+-                                    resolve->call(rt, resultGenerator(rt));
++                                    try {
++                                        auto result = resultGenerator(rt);
++                                        resolve->call(rt, std::move(result));
++                                    } catch (const std::exception& e) {
++                                        reject->call(rt, jsi::String::createFromUtf8(rt, e.what()));
++                                    } catch (...) {
++                                        reject->call(
++                                            rt,
++                                            jsi::String::createFromUtf8(
++                                                rt,
++                                                "Unknown error while resolving native result"
++                                            )
++                                        );
++                                    }
+                                 });
+                                 invokeScheduled = true;
+                             } catch (...) {
+diff --git a/node_modules/cui-llama.rn/cpp/jsi/RNLlamaJSI.cpp b/node_modules/cui-llama.rn/cpp/jsi/RNLlamaJSI.cpp
+index bb39e61..3166f13 100644
+--- a/node_modules/cui-llama.rn/cpp/jsi/RNLlamaJSI.cpp
++++ b/node_modules/cui-llama.rn/cpp/jsi/RNLlamaJSI.cpp
+@@ -219,7 +219,7 @@ namespace rnllama_jsi {
+     static jsi::Array toJsStringArray(jsi::Runtime& runtime, const std::vector<std::string>& values) {
+         jsi::Array arr(runtime, values.size());
+         for (size_t i = 0; i < values.size(); ++i) {
+-            arr.setValueAtIndex(runtime, i, jsi::String::createFromUtf8(runtime, values[i]));
++            arr.setValueAtIndex(runtime, i, makeJsStringSafe(runtime, values[i]));
+         }
+         return arr;
+     }
+@@ -247,7 +247,7 @@ namespace rnllama_jsi {
+ 
+         char desc[1024];
+         llama_model_desc(ctx->model, desc, sizeof(desc));
+-        model.setProperty(runtime, "desc", jsi::String::createFromUtf8(runtime, desc));
++        model.setProperty(runtime, "desc", makeJsStringSafe(runtime, desc));
+         model.setProperty(runtime, "size", (double)llama_model_size(ctx->model));
+         model.setProperty(runtime, "nEmbd", (double)llama_model_n_embd(ctx->model));
+         model.setProperty(runtime, "nParams", (double)llama_model_n_params(ctx->model));
+@@ -262,7 +262,7 @@ namespace rnllama_jsi {
+             llama_model_meta_key_by_index(ctx->model, i, key, sizeof(key));
+             char val[16384];
+             llama_model_meta_val_str_by_index(ctx->model, i, val, sizeof(val));
+-            metadata.setProperty(runtime, key, jsi::String::createFromUtf8(runtime, val));
++            setSafeStringProperty(runtime, metadata, key ? key : "", val);
+         }
+         model.setProperty(runtime, "metadata", metadata);
+ 
+@@ -579,8 +579,8 @@ namespace rnllama_jsi {
+                          return [gpuEnabled, reasonNoGPU, system_info, usedDevices, contextId](jsi::Runtime& rt) {
+                              jsi::Object result(rt);
+                              result.setProperty(rt, "gpu", gpuEnabled);
+-                             result.setProperty(rt, "reasonNoGPU", jsi::String::createFromUtf8(rt, reasonNoGPU));
+-                             result.setProperty(rt, "systemInfo", jsi::String::createFromUtf8(rt, system_info));
++                             result.setProperty(rt, "reasonNoGPU", makeJsStringSafe(rt, reasonNoGPU));
++                             result.setProperty(rt, "systemInfo", makeJsStringSafe(rt, system_info));
+ 
+                              // Model metadata and chat template capabilities
+                              long ctxPtr = g_llamaContexts.get(contextId);
+@@ -595,7 +595,7 @@ namespace rnllama_jsi {
+                              #if defined(__ANDROID__)
+                              androidLibName = g_android_loaded_library;
+                              #endif
+-                             result.setProperty(rt, "androidLib", jsi::String::createFromUtf8(rt, androidLibName));
++                             result.setProperty(rt, "androidLib", makeJsStringSafe(rt, androidLibName));
+                              return result;
+                          };
+                     } else {
