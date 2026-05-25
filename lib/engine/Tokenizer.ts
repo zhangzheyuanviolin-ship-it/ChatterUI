@@ -1,71 +1,67 @@
-import { useAppModeStore } from '@lib/state/AppMode'
-import { Logger } from '@lib/state/Logger'
 import { initLlama, LlamaContext } from 'cui-llama.rn'
 import { Asset } from 'expo-asset'
-import {
-    copyAsync,
-    deleteAsync,
-    documentDirectory,
-    getInfoAsync,
-    makeDirectoryAsync,
-} from 'expo-file-system'
 import { create } from 'zustand'
+
+import { useAppModeStore } from '@lib/state/AppMode'
+import { Logger } from '@lib/state/Logger'
+import { AppDirectory, copyFile, fileExists, makeDirectory } from '@lib/utils/File'
 
 import { Llama } from './Local/LlamaLocal'
 
 type TokenizerState = {
     model?: LlamaContext
-    tokenize: (text: string) => number[]
-    getTokenCount: (text: string, image_urls?: string[]) => number
+    tokenize: (text: string) => Promise<number[]>
+    getTokenCount: (text: string, image_urls?: string[]) => Promise<number>
     loadModel: () => Promise<void>
 }
+
+const tokenizerModelDir = `${AppDirectory.Assets}llama3tokenizer.gguf`
 
 export namespace Tokenizer {
     export const useTokenizerState = create<TokenizerState>()((set, get) => ({
         model: undefined,
-        tokenize: (text: string) => {
-            return get()?.model?.tokenizeSync(text)?.tokens ?? []
+        tokenize: async (text: string) => {
+            return (await get()?.model?.tokenize(text))?.tokens ?? []
         },
-        // name this for trace stack
-        getTokenCount: function getTokenCount(text: string, image_urls: string[] = []) {
+        getTokenCount: async function getTokenCount(text: string, image_urls: string[] = []) {
             const model = get().model
             if (!model) {
                 Logger.warn('Tokenizer not loaded')
                 return 0
             }
-            return model.tokenizeSync(text).tokens.length + image_urls.length * 512
+            return (await model.tokenize(text)).tokens.length + image_urls.length * 512
         },
         loadModel: async () => {
             if (get().model) return
-
-            await importModelFromRes().catch((e) => {
-                Logger.error('Could not import Tokenizer: ' + e)
-            })
-
-            const context = await initLlama({
-                model: documentDirectory + 'appAssets/llama3tokenizer.gguf',
-                vocab_only: true,
-                use_mlock: true,
-            })
-            set((state) => ({ ...state, model: context }))
+            try {
+                await importModelFromRes()
+                Logger.info('Loading Tokenizer')
+                const context = await initLlama({
+                    model: tokenizerModelDir,
+                    vocab_only: true,
+                    n_gpu_layers: 0,
+                    devices: ['CPU'],
+                })
+                Logger.info('Tokenizer Loaded')
+                set({ model: context })
+            } catch (e) {
+                Logger.error('Failed to load tokenizer: ' + e)
+            }
         },
     }))
 
     const importModelFromRes = async () => {
-        const folderDir = `${documentDirectory}appAssets/`
-        const folderExists = (await getInfoAsync(folderDir)).exists
-        if (!folderExists) await makeDirectoryAsync(`${documentDirectory}appAssets`)
-        const modelDir = `${folderDir}llama3tokenizer.gguf`
-        const modelExists = (await getInfoAsync(modelDir)).exists
-        if (modelExists) return
+        if (await fileExists(tokenizerModelDir)) return
+        await makeDirectory(AppDirectory.Assets)
         Logger.info('Importing Tokenizer')
         const [asset] = await Asset.loadAsync(require('./../../assets/models/llama3tokenizer.gguf'))
         await asset.downloadAsync()
-        if (asset.localUri) await copyAsync({ from: asset.localUri, to: modelDir })
-    }
-
-    export const debugDeleteModel = async () => {
-        await deleteAsync(documentDirectory + 'appAssets')
+        if (asset.localUri) {
+            const copied = await copyFile({ from: asset.localUri, to: tokenizerModelDir })
+            if (!copied) throw new Error('Failed to import tokenizer asset')
+        } else {
+            throw new Error('Failed to resolve tokenizer asset')
+        }
     }
 
     export const getTokenizer = () => {

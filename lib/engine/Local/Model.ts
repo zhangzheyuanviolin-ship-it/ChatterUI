@@ -1,13 +1,27 @@
+import {
+    closeFd,
+    copyFileSAF,
+    getContentFd,
+    persistContentPermission,
+} from '@vali98/react-native-fs'
 import { db } from '@db'
 import { Storage } from '@lib/enums/Storage'
 import { Logger } from '@lib/state/Logger'
 import { createMMKVStorage } from '@lib/storage/MMKV'
-import { AppDirectory, readableFileSize } from '@lib/utils/File'
+import {
+    AppDirectory,
+    copyFile,
+    deleteFile,
+    fileExists,
+    fileInfo,
+    listFiles,
+    readableFileSize,
+} from '@lib/utils/File'
 import { loadLlamaModelInfo } from 'cui-llama.rn'
 import { model_data, model_mmproj_links, ModelDataType } from 'db/schema'
 import { eq, inArray, notInArray } from 'drizzle-orm'
 import { getDocumentAsync } from 'expo-document-picker'
-import { copyAsync, deleteAsync, getInfoAsync, readDirectoryAsync } from 'expo-file-system'
+import { deleteAsync, getInfoAsync } from 'expo-file-system'
 import { Platform } from 'react-native'
 import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
@@ -28,7 +42,7 @@ const mmprojArchs = ['clip', 'llava']
 
 export namespace Model {
     export const getModelList = async () => {
-        return await readDirectoryAsync(AppDirectory.ModelPath)
+        return await listFiles(AppDirectory.ModelPath)
     }
 
     export const deleteModelById = async (id: number) => {
@@ -53,21 +67,27 @@ export namespace Model {
             const name = file.name
             const newdir = `${AppDirectory.ModelPath}${name}`
             Logger.infoToast('Importing file...')
-            const success = await copyAsync({
-                from: file.uri,
-                to: newdir,
-            })
-                .then(() => {
-                    return true
+            let success = false
+
+            if (file.uri.startsWith('content://') && Platform.OS === 'android') {
+                success = await copyFileSAF(file.uri, newdir.replace('file://', ''))
+                    .then(() => true)
+                    .catch((error) => {
+                        Logger.errorToast(`Import Failed: ${error.message}`)
+                        return false
+                    })
+            } else {
+                success = await copyFile({
+                    from: file.uri,
+                    to: newdir,
                 })
-                .catch((error) => {
-                    Logger.errorToast(`Import Failed: ${error.message}`)
-                    return false
-                })
+            }
             if (!success) return
 
             // database routine here
-            if (await createModelData(name, true)) Logger.infoToast(`Model Imported Sucessfully!`)
+            if (await createModelData(name, true, file.size)) {
+                Logger.infoToast(`Model Imported Sucessfully!`)
+            }
         })
     }
 
@@ -83,18 +103,36 @@ export namespace Model {
                 return
             }
 
-            if (await createModelDataExternal(file.uri, file.name, true))
+            if (await createModelDataExternal(file.uri, file.name, false, file.size)) {
+                if (file.uri.startsWith('content://') && Platform.OS === 'android') {
+                    await persistContentPermission(file.uri).catch((e) => {
+                        Logger.warn(`Failed to persist URI permission: ${e}`)
+                    })
+                }
                 Logger.infoToast(`Model Imported Sucessfully!`)
+            }
         })
     }
 
     export const getModelExists = async (path: string) => {
-        return await getInfoAsync(path)
-            .then((result) => result.exists)
-            .catch((e) => {
+        if (path.startsWith('content://') && Platform.OS === 'android') {
+            let resolvedPath: string | undefined
+            try {
+                resolvedPath = (await getContentFd(path)) ?? undefined
+                return !!resolvedPath
+            } catch (e) {
                 Logger.error(`${e}`)
                 return false
-            })
+            } finally {
+                if (resolvedPath) {
+                    await closeFd(resolvedPath).catch((e) => {
+                        Logger.warn(`Failed to close content fd: ${e}`)
+                    })
+                }
+            }
+        }
+
+        return await fileExists(path)
     }
 
     export const verifyModelList = async () => {
@@ -121,24 +159,30 @@ export namespace Model {
         })
     }
 
-    export const createModelData = async (filename: string, deleteOnFailure: boolean = false) => {
+    export const createModelData = async (
+        filename: string,
+        deleteOnFailure: boolean = false,
+        fileSizeHint?: number
+    ) => {
         return setModelDataInternal(
             filename,
             `${AppDirectory.ModelPath}${filename}`,
-            deleteOnFailure
+            deleteOnFailure,
+            fileSizeHint
         )
     }
 
     export const createModelDataExternal = async (
         newdir: string,
         filename: string,
-        deleteOnFailure: boolean = false
+        deleteOnFailure: boolean = false,
+        fileSizeHint?: number
     ) => {
         if (!filename) {
             Logger.errorToast('Filename invalid, Import Failed')
             return
         }
-        return setModelDataInternal(filename, newdir, deleteOnFailure)
+        return setModelDataInternal(filename, newdir, deleteOnFailure, fileSizeHint)
     }
 
     export const getModelListQuery = () => {
@@ -217,8 +261,11 @@ export namespace Model {
     const setModelDataInternal = async (
         filename: string,
         file_path: string,
-        deleteOnFailure: boolean
+        deleteOnFailure: boolean,
+        fileSizeHint?: number
     ) => {
+        let loadablePath = file_path
+        let closeLoadablePath = false
         try {
             const [{ id }, ...rest] = await db
                 .insert(model_data)
@@ -227,12 +274,18 @@ export namespace Model {
 
             // This will load GGUF KV-pairs
             // refer to https://github.com/ggml-org/ggml/blob/master/docs/gguf.md#standardized-key-value-pairs
+            if (loadablePath.startsWith('content://') && Platform.OS === 'android') {
+                loadablePath = (await getContentFd(loadablePath)) ?? loadablePath
+                closeLoadablePath = loadablePath !== file_path
+            }
 
-            const modelInfo: any = await loadLlamaModelInfo(file_path)
-            let fileSize = 0
-            const fileResult = await getInfoAsync(file_path)
-            if (fileResult.exists) {
-                fileSize = fileResult.size
+            const modelInfo: any = await loadLlamaModelInfo(loadablePath)
+            let fileSize = fileSizeHint ?? 0
+            if (!fileSizeHint && !file_path.startsWith('content://')) {
+                const fileResult = await fileInfo(file_path)
+                if (fileResult.exists) {
+                    fileSize = fileResult.size ?? 0
+                }
             }
             const modelType = modelInfo?.['general.architecture']
             const modelDataEntry = {
@@ -250,8 +303,14 @@ export namespace Model {
             return true
         } catch (e) {
             Logger.errorToast(`Failed to create data: ${e}`)
-            if (deleteOnFailure) deleteAsync(file_path, { idempotent: true })
+            if (deleteOnFailure) await deleteFile(file_path)
             return false
+        } finally {
+            if (closeLoadablePath) {
+                await closeFd(loadablePath).catch((e) => {
+                    Logger.warn(`Failed to close content fd: ${e}`)
+                })
+            }
         }
     }
 
@@ -267,7 +326,7 @@ export namespace Model {
 
     const deleteModel = async (name: string) => {
         if (!(await modelExists(name))) return
-        return await deleteAsync(`${AppDirectory.ModelPath}${name}`)
+        return await deleteFile(`${AppDirectory.ModelPath}${name}`)
     }
 }
 

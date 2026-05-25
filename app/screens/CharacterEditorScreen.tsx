@@ -62,11 +62,22 @@ const ChracterEditorScreen = () => {
     const setShowViewer = useAvatarViewerStore((state) => state.setShow)
     const [edited, setEdited] = useState(false)
     const [altSwipeIndex, setAltSwipeIndex] = useState(0)
+    const [descriptionTokens, setDescriptionTokens] = useState(0)
 
     const setCharacterCardEdited = (card: CharacterCardData) => {
         if (!edited) setEdited(true)
         setCharacterCard(card)
     }
+
+    useEffect(() => {
+        let active = true
+        getTokenCount(characterCard?.description ?? '').then((count) => {
+            if (active) setDescriptionTokens(count)
+        })
+        return () => {
+            active = false
+        }
+    }, [characterCard?.description, getTokenCount])
 
     usePreventRemove(edited, ({ data }) => {
         if (!charId) return
@@ -347,7 +358,7 @@ const ChracterEditorScreen = () => {
 
                         <ThemedTextInput
                             scrollEnabled
-                            label={`Description Tokens: ${getTokenCount(characterCard?.description ?? '')}`}
+                            label={`Description Tokens: ${descriptionTokens}`}
                             multiline
                             containerStyle={styles.input}
                             numberOfLines={8}

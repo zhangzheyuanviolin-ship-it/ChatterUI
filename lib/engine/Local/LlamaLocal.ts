@@ -1,5 +1,6 @@
+import { closeFd, getContentFd } from '@vali98/react-native-fs'
 import { Storage } from '@lib/enums/Storage'
-import { AppDirectory, readableFileSize } from '@lib/utils/File'
+import { AppDirectory, fileExists, readableFileSize, writeBase64File } from '@lib/utils/File'
 import {
     CompletionParams,
     ContextParams,
@@ -8,7 +9,6 @@ import {
     RNLLAMA_MTMD_DEFAULT_MEDIA_MARKER,
 } from 'cui-llama.rn'
 import { ModelDataType } from 'db/schema'
-import { getInfoAsync, writeAsStringAsync } from 'expo-file-system'
 import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
 
@@ -56,7 +56,7 @@ export type LlamaState = {
     ) => Promise<void>
     stopCompletion: () => Promise<void>
     tokenLength: (text: string, mediaPaths?: string[]) => Promise<number>
-    tokenize: (text: string, media_paths?: string[]) => { tokens: number[] } | undefined
+    tokenize: (text: string, media_paths?: string[]) => Promise<{ tokens: number[] } | undefined>
 }
 
 export type LlamaConfig = {
@@ -65,6 +65,7 @@ export type LlamaConfig = {
     gpu_layers: number
     batch: number
     ctx_shift: boolean
+    devices: string[]
 }
 
 export type EngineDataProps = {
@@ -85,6 +86,7 @@ const defaultConfig = {
     gpu_layers: 0,
     batch: 512,
     ctx_shift: true,
+    devices: [],
 }
 
 export namespace Llama {
@@ -118,12 +120,17 @@ export namespace Llama {
                     lastMmproj: state.lastMmproj,
                 }),
                 storage: createMMKVStorage(),
-                version: 1,
+                version: 3,
                 migrate: (persistedState: any, version) => {
-                    if (version === 1) {
+                    if (version <= 1) {
                         persistedState.config.ctx_shift = true
                         Logger.info('Migrated to v2 EngineData')
                     }
+                    if (version <= 2) {
+                        persistedState.config.devices = []
+                        Logger.info('Migrated to v3 EngineData')
+                    }
+                    return persistedState
                 },
             }
         )
@@ -155,27 +162,44 @@ export namespace Llama {
                 await get().unload()
             }
 
+            let modelPath = model.file_path
+            let closeModelPath = false
+            if (modelPath.includes('content://')) {
+                modelPath = (await getContentFd(modelPath)) ?? modelPath
+                closeModelPath = modelPath !== model.file_path
+            }
+
             const params: ContextParams = {
-                model: model.file_path,
+                model: modelPath,
                 n_ctx: config.context_length,
                 n_threads: config.threads,
                 n_batch: config.batch,
                 ctx_shift: config.ctx_shift,
+                n_gpu_layers: config.gpu_layers,
                 use_mlock: true,
                 use_mmap: true,
+                devices: config.devices,
             }
 
             Logger.info(
-                `\n------ MODEL LOAD -----\n Model Name: ${model.name}\nStarting with parameters: \nContext Length: ${params.n_ctx}\nThreads: ${params.n_threads}\nBatch Size: ${params.n_batch}`
+                `\n------ MODEL LOAD -----\n Model Name: ${model.name}\nStarting with parameters: \nContext Length: ${params.n_ctx}\nThreads: ${params.n_threads}\nBatch Size: ${params.n_batch}\nGPU Layers: ${params.n_gpu_layers}`
             )
 
             const progressCallback = (progress: number) => {
                 if (progress % 5 === 0) get().setLoadProgress(progress)
             }
 
-            const llamaContext = await initLlama(params, progressCallback).catch((error) => {
-                Logger.errorToast(`Could Not Load Model: ${error} `)
-            })
+            const llamaContext = await initLlama(params, progressCallback)
+                .catch((error) => {
+                    Logger.errorToast(`Could Not Load Model: ${error} `)
+                })
+                .finally(async () => {
+                    if (closeModelPath) {
+                        await closeFd(modelPath).catch((e) => {
+                            Logger.warn(`Failed to close content fd: ${e}`)
+                        })
+                    }
+                })
 
             if (!llamaContext) return
 
@@ -193,13 +217,31 @@ export namespace Llama {
             const context = get().context
             if (!context) return
 
+            let modelPath = model.file_path
+            let closeModelPath = false
+            if (modelPath.includes('content://')) {
+                modelPath = (await getContentFd(modelPath)) ?? modelPath
+                closeModelPath = modelPath !== model.file_path
+            }
+
             Logger.info('Loading MMPROJ')
             await context
-                .initMultimodal({ path: model.file_path, use_gpu: true })
+                .initMultimodal({ path: modelPath, use_gpu: true })
                 .catch((e) => Logger.errorToast('Failed to load MMPROJ: ' + e))
+                .finally(async () => {
+                    if (closeModelPath) {
+                        await closeFd(modelPath).catch((e) => {
+                            Logger.warn(`Failed to close content fd: ${e}`)
+                        })
+                    }
+                })
 
-            // TODO: Fix previewing model capabilities
-            // refer to https://github.com/mybigday/llama.rn/issues/151
+            if (await context.isMultimodalEnabled()) {
+                const capabilities = await context.getMultimodalSupport()
+                Logger.info(
+                    `MMPROJ Loaded:\n- Vision: ${capabilities.vision}\n- Audio: ${capabilities.audio}`
+                )
+            }
 
             set({
                 mmproj: model,
@@ -221,6 +263,7 @@ export namespace Llama {
                 model: undefined,
                 mmproj: undefined,
             })
+            Logger.info('Model Unloaded')
         },
         unloadMmproj: async () => {
             if (!get().mmproj) return
@@ -270,13 +313,13 @@ export namespace Llama {
             }
 
             if (prompt) {
-                const tokens = get().tokenize(prompt, media_paths ?? [])?.tokens
+                const tokens = (await get().tokenize(prompt, media_paths ?? []))?.tokens
                 KV.useKVStore.getState().setKvCacheTokens(tokens ?? [])
             }
 
-            if (!(await getInfoAsync(sessionFile)).exists) {
+            if (!(await fileExists(sessionFile))) {
                 Logger.warn('Session file does not exist, creating...')
-                await writeAsStringAsync(sessionFile, '', { encoding: 'base64' })
+                await writeBase64File(sessionFile, '')
             }
 
             const now = performance.now()
@@ -295,8 +338,7 @@ export namespace Llama {
                 Logger.errorToast('No Model Loaded')
                 return false
             }
-            const data = await getInfoAsync(sessionFile)
-            if (!data.exists) {
+            if (!(await fileExists(sessionFile))) {
                 Logger.warn('No Cache found')
                 return false
             }
@@ -316,7 +358,7 @@ export namespace Llama {
             if (!get().mmproj && mediaPaths.length > 0) {
                 Logger.warnToast('Media was added without MMPROJ model')
             }
-            const result = await get().context?.tokenizeAsync(
+            const result = await get().context?.tokenize(
                 text + finalPaths.map(() => RNLLAMA_MTMD_DEFAULT_MEDIA_MARKER).join(),
                 {
                     media_paths: finalPaths.map((item) => item.replace('file://', '')),
@@ -325,9 +367,11 @@ export namespace Llama {
             if (!result) return 0
             return result.tokens.length
         },
-        tokenize: (text: string, media_paths: string[] = []) => {
-            const params = get().mmproj ? { media_paths } : {}
-            return get().context?.tokenizeSync(text, params)
+        tokenize: async (text: string, media_paths: string[] = []) => {
+            const params = get().mmproj
+                ? { media_paths: media_paths.map((item) => item.replace('file://', '')) }
+                : {}
+            return await get().context?.tokenize(text, params)
         },
     }))
 

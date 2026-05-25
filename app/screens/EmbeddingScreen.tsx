@@ -1,8 +1,7 @@
 import { rawdb } from '@db'
 import { LlamaConfig } from '@lib/engine/Local/LlamaLocal'
 import { Theme } from '@lib/theme/ThemeManager'
-import { initLlama, LlamaContext } from 'cui-llama.rn'
-import { NativeEmbeddingResult } from 'cui-llama.rn/lib/typescript/NativeRNLlama'
+import { initLlama, LlamaContext, NativeEmbeddingResult } from 'cui-llama.rn'
 import { documentDirectory } from 'expo-file-system'
 import { useState } from 'react'
 import { Text, TextInput, TouchableOpacity, View } from 'react-native'
@@ -99,7 +98,7 @@ const EmbeddingScreen = () => {
                     let s1 = 0
                     let s2 = 0
                     let dotprod = 0
-                    v1?.embedding.forEach((item, index) => {
+                    v1?.embedding.forEach((item: number, index: number) => {
                         dotprod += v1.embedding[index] * v2.embedding[index]
                         s1 += v1.embedding[index] * v1.embedding[index]
                         s2 += v2.embedding[index] * v2.embedding[index]

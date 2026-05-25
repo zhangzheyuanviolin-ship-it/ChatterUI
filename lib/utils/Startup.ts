@@ -6,7 +6,7 @@ import { Instructs } from '@lib/state/Instructs'
 import { SamplersManager } from '@lib/state/SamplerState'
 import { useTTSStore } from '@lib/state/TTS'
 import { getThreads } from '@vali98/react-native-cpu-info'
-import { getCpuFeatures } from 'cui-llama.rn'
+import { getBackendDevicesInfo } from 'cui-llama.rn'
 import { DeviceType, getDeviceTypeAsync } from 'expo-device'
 import {
     deleteAsync,
@@ -60,8 +60,12 @@ const createDefaultCard = async () => {
 
 const setCPUFeatures = async () => {
     if (mmkv.getString(Global.CpuFeatures)) return
-    const result = getCpuFeatures()
-    mmkv.set(Global.CpuFeatures, JSON.stringify(result))
+    try {
+        const result = await getBackendDevicesInfo()
+        mmkv.set(Global.CpuFeatures, JSON.stringify(result))
+    } catch (e) {
+        Logger.warn('Failed to get backend devices info: ' + e)
+    }
 }
 
 const migrateModelData_0_7_10_to_0_8_0 = () => {

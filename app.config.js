@@ -1,11 +1,37 @@
-const IS_DEV = process.env.APP_VARIANT === 'development'
+const APP_VARIANT = process.env.APP_VARIANT ?? 'production'
+
+const VARIANT_CONFIG = {
+    production: {
+        name: 'ChatterUI',
+        identifier: 'com.Vali98.ChatterUI',
+        version: '0.8.8',
+        buildNumber: '1',
+        versionCode: 1,
+    },
+    development: {
+        name: 'ChatterUI (DEV)',
+        identifier: 'com.Vali98.ChatterUIDev',
+        version: '0.8.8',
+        buildNumber: '1',
+        versionCode: 1,
+    },
+    shipit: {
+        name: 'ChatterUI Next',
+        identifier: 'com.zhangzheyuan.chatterui.next',
+        version: '0.8.8-engine1',
+        buildNumber: '2',
+        versionCode: 2,
+    },
+}
+
+const selectedVariant = VARIANT_CONFIG[APP_VARIANT] ?? VARIANT_CONFIG.production
 
 module.exports = {
     expo: {
-        name: IS_DEV ? 'ChatterUI (DEV)' : 'ChatterUI',
+        name: selectedVariant.name,
         newArchEnabled: true,
         slug: 'ChatterUI',
-        version: '0.8.8',
+        version: selectedVariant.version,
         orientation: 'default',
         icon: './assets/images/icon.png',
         scheme: 'chatterui',
@@ -18,8 +44,9 @@ module.exports = {
                 tinted: './assets/images/icon.png',
             },
             supportsTablet: true,
-            package: IS_DEV ? 'com.Vali98.ChatterUIDev' : 'com.Vali98.ChatterUI',
-            bundleIdentifier: IS_DEV ? 'com.Vali98.ChatterUIDev' : 'com.Vali98.ChatterUI',
+            package: selectedVariant.identifier,
+            bundleIdentifier: selectedVariant.identifier,
+            buildNumber: selectedVariant.buildNumber,
         },
         android: {
             adaptiveIcon: {
@@ -29,7 +56,8 @@ module.exports = {
                 backgroundColor: '#000',
             },
             edgeToEdgeEnabled: true,
-            package: IS_DEV ? 'com.Vali98.ChatterUIDev' : 'com.Vali98.ChatterUI',
+            package: selectedVariant.identifier,
+            versionCode: selectedVariant.versionCode,
             userInterfaceStyle: 'dark',
             permissions: [
                 'android.permission.FOREGROUND_SERVICE',
@@ -96,6 +124,8 @@ module.exports = {
             './expo-build-plugins/bgactions.plugin.js',
             './expo-build-plugins/copyjni.plugin.js',
             './expo-build-plugins/usercert.plugin.js',
+            './expo-build-plugins/rnllama.plugin.js',
+            './expo-build-plugins/copyhtp.plugin.js',
         ],
         experiments: {
             typedRoutes: true,

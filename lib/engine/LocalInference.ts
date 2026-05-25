@@ -233,7 +233,7 @@ export const localInference = async () => {
         }
 
         if (mmkv.getBoolean(AppSettings.SaveLocalKV) && !KV.useKVStore.getState().kvCacheLoaded) {
-            const prompt = Llama.useLlamaModelStore
+            const prompt = await Llama.useLlamaModelStore
                 .getState()
                 .tokenize(payload.prompt, payload.media_paths)
             const result = KV.useKVStore.getState().verifyKVCache(prompt?.tokens ?? [])
@@ -301,9 +301,11 @@ const runLocalCompletion = async (
         stopGenerating()
     }
 
+    const engineData = Llama.useLlamaPreferencesStore.getState().config
+
     await Llama.useLlamaModelStore
         .getState()
-        .completion(payload, outputStream, outputCompleted)
+        .completion({ ...payload, n_threads: engineData.threads }, outputStream, outputCompleted)
         .catch((error) => {
             Logger.errorToast(`Failed to generate locally: ${error}`)
             stopGenerating()

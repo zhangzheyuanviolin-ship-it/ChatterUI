@@ -2,8 +2,13 @@ import { localDownload } from '@vali98/react-native-fs'
 import { getDocumentAsync } from 'expo-document-picker'
 import {
     cacheDirectory,
+    copyAsync,
+    deleteAsync,
     documentDirectory,
+    getInfoAsync,
+    makeDirectoryAsync,
     readAsStringAsync,
+    readDirectoryAsync,
     writeAsStringAsync,
 } from 'expo-file-system'
 
@@ -58,7 +63,7 @@ export const pickStringDocument = async ({
     encoding?: 'utf8' | 'base64'
     type?: string
 } = {}): Promise<PickerResult> => {
-    const result = await getDocumentAsync({ type: type })
+    const result = await getDocumentAsync({ type: type, multiple })
     if (result.canceled) {
         return { success: false }
     }
@@ -88,4 +93,59 @@ export const readableFileSize = (size: number) => {
         const sizeInGB = size / gb
         return `${sizeInGB.toFixed(2)} GB`
     }
+}
+
+export const listFiles = async (path: string) => {
+    return (await readDirectoryAsync(path)).filter(Boolean)
+}
+
+export const fileExists = async (path: string) => {
+    return await getInfoAsync(path)
+        .then((result) => result.exists)
+        .catch((e) => {
+            Logger.error('Failed to check file existence: ' + e)
+            return false
+        })
+}
+
+export const directoryExists = fileExists
+
+export const copyFile = async ({ from, to }: { from: string; to: string }) => {
+    try {
+        await copyAsync({ from, to })
+        return true
+    } catch (e) {
+        Logger.error('Failed to copy: ' + e)
+        return false
+    }
+}
+
+export const deleteFile = async (path: string) => {
+    try {
+        await deleteAsync(path, { idempotent: true })
+        return true
+    } catch (e) {
+        Logger.error('Failed to delete: ' + e)
+        return false
+    }
+}
+
+export const readBase64Async = async (path: string) => {
+    return await readAsStringAsync(path, { encoding: 'base64' })
+}
+
+export const readStringAsync = async (path: string) => {
+    return await readAsStringAsync(path, { encoding: 'utf8' })
+}
+
+export const writeBase64File = async (path: string, content: string) => {
+    return await writeAsStringAsync(path, content, { encoding: 'base64' })
+}
+
+export const fileInfo = async (path: string) => {
+    return await getInfoAsync(path)
+}
+
+export const makeDirectory = async (path: string) => {
+    await makeDirectoryAsync(path, { intermediates: true })
 }
