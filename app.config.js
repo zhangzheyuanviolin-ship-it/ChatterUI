@@ -18,9 +18,9 @@ const VARIANT_CONFIG = {
     shipit: {
         name: 'ChatterUI Next',
         identifier: 'com.zhangzheyuan.chatterui.next',
-        version: '0.8.8-engine1',
-        buildNumber: '2',
-        versionCode: 2,
+        version: '0.8.8-engine2',
+        buildNumber: '3',
+        versionCode: 3,
     },
 }
 

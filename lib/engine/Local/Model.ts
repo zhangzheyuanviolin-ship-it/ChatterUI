@@ -1,9 +1,3 @@
-import {
-    closeFd,
-    copyFileSAF,
-    getContentFd,
-    persistContentPermission,
-} from '@vali98/react-native-fs'
 import { db } from '@db'
 import { Storage } from '@lib/enums/Storage'
 import { Logger } from '@lib/state/Logger'
@@ -17,6 +11,12 @@ import {
     listFiles,
     readableFileSize,
 } from '@lib/utils/File'
+import {
+    closeFd,
+    copyFileSAF,
+    getContentFd,
+    persistContentPermission,
+} from '@vali98/react-native-fs'
 import { loadLlamaModelInfo } from 'cui-llama.rn'
 import { model_data, model_mmproj_links, ModelDataType } from 'db/schema'
 import { eq, inArray, notInArray } from 'drizzle-orm'
@@ -63,9 +63,17 @@ export namespace Model {
             copyToCacheDirectory: false,
         }).then(async (result) => {
             if (result.canceled) return
-            const file = result.assets[0]
+            const file = result.assets?.[0]
+            if (!file?.uri || !file?.name) {
+                Logger.errorToast('File Invalid')
+                Logger.error(`Import returned invalid asset: ${JSON.stringify(result)}`)
+                return
+            }
             const name = file.name
             const newdir = `${AppDirectory.ModelPath}${name}`
+            Logger.info(
+                `Import selected file:\nName: ${name}\nURI: ${file.uri}\nSize: ${file.size ?? 'unknown'}`
+            )
             Logger.infoToast('Importing file...')
             let success = false
 
@@ -96,12 +104,16 @@ export namespace Model {
             copyToCacheDirectory: false,
         }).then(async (result) => {
             if (result.canceled) return
-            const file = result.assets[0]
+            const file = result.assets?.[0]
             Logger.infoToast('Importing file...')
             if (!file) {
                 Logger.errorToast('File Invalid')
+                Logger.error(`External link returned invalid asset: ${JSON.stringify(result)}`)
                 return
             }
+            Logger.info(
+                `Linking external model:\nName: ${file.name}\nURI: ${file.uri}\nSize: ${file.size ?? 'unknown'}`
+            )
 
             if (await createModelDataExternal(file.uri, file.name, false, file.size)) {
                 if (file.uri.startsWith('content://') && Platform.OS === 'android') {

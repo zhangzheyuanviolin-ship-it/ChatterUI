@@ -1,4 +1,5 @@
 import ThemedButton from '@components/buttons/ThemedButton'
+import HorizontalSelector from '@components/input/HorizontalSelector'
 import ThemedSlider from '@components/input/ThemedSlider'
 import ThemedSwitch from '@components/input/ThemedSwitch'
 import SectionTitle from '@components/text/SectionTitle'
@@ -6,6 +7,7 @@ import Alert from '@components/views/Alert'
 import { AppSettings, Global } from '@lib/constants/GlobalValues'
 import { Llama } from '@lib/engine/Local/LlamaLocal'
 import { KV } from '@lib/engine/Local/Model'
+import useBackendDevices from '@lib/hooks/BackendDevices'
 import { t } from '@lib/i18n'
 import { Logger } from '@lib/state/Logger'
 import { readableFileSize } from '@lib/utils/File'
@@ -22,6 +24,8 @@ type ModelSettingsProp = {
     exit: () => void
 }
 
+const deviceLabels = { GPUOpenCL: 'OpenCL', HTP0: 'Hexagon', CPU: 'CPU' }
+
 const ModelSettings: React.FC<ModelSettingsProp> = ({ modelImporting, modelLoading, exit }) => {
     const { config, setConfig } = Llama.useLlamaPreferencesStore(
         useShallow((state) => ({
@@ -29,6 +33,7 @@ const ModelSettings: React.FC<ModelSettingsProp> = ({ modelImporting, modelLoadi
             setConfig: state.setConfiguration,
         }))
     )
+    const devices = useBackendDevices()
 
     const [saveKV, setSaveKV] = useMMKVBoolean(AppSettings.SaveLocalKV)
     const [autoloadLocal, setAutoloadLocal] = useMMKVBoolean(AppSettings.AutoLoadLocal)
@@ -119,8 +124,7 @@ const ModelSettings: React.FC<ModelSettingsProp> = ({ modelImporting, modelLoadi
                         disabled={modelImporting || modelLoading}
                     />
 
-                    {/* Note: llama.rn does not have any Android gpu acceleration */}
-                    {Platform.OS === 'ios' && (
+                    {(Platform.OS === 'ios' || devices.length > 1) && (
                         <ThemedSlider
                             label="GPU Layers"
                             value={config.gpu_layers}
@@ -128,6 +132,7 @@ const ModelSettings: React.FC<ModelSettingsProp> = ({ modelImporting, modelLoadi
                             min={0}
                             max={100}
                             step={1}
+                            disabled={modelImporting || modelLoading}
                         />
                     )}
 
@@ -138,6 +143,22 @@ const ModelSettings: React.FC<ModelSettingsProp> = ({ modelImporting, modelLoadi
                             setConfig({ ...config, ctx_shift: value })
                         }}
                     />
+
+                    {devices.length > 1 && (
+                        <HorizontalSelector
+                            style={{ paddingBottom: 12 }}
+                            label="Backend Device"
+                            values={devices.map((item) => ({
+                                label: deviceLabels[item as keyof typeof deviceLabels] ?? item,
+                                value: item,
+                            }))}
+                            selected={config.devices?.[0] ?? 'CPU'}
+                            onPress={(value) => {
+                                const selectedDevices = value === 'CPU' ? [value] : [value, 'CPU']
+                                setConfig({ ...config, devices: selectedDevices })
+                            }}
+                        />
+                    )}
                 </>
             )}
             <SectionTitle>Advanced Settings</SectionTitle>

@@ -1,5 +1,6 @@
 import PopupMenu, { MenuRef } from '@components/views/PopupMenu'
 import { Model } from '@lib/engine/Local/Model'
+import { t } from '@lib/i18n'
 import { useState } from 'react'
 import { View } from 'react-native'
 
@@ -34,15 +35,16 @@ const ModelNewMenu: React.FC<ModelNewMenuProps> = ({ modelImporting, setModelImp
             <PopupMenu
                 placement="bottom"
                 icon="addfile"
+                triggerLabel={t('Add model')}
                 disabled={modelImporting}
                 options={[
                     {
-                        label: 'Copy Model Into ChatterUI',
+                        label: t('Copy Model Into ChatterUI'),
                         icon: 'download',
                         onPress: handleImportModel,
                     },
                     {
-                        label: 'Use External Model',
+                        label: t('Use External Model'),
                         icon: 'link',
                         onPress: handleSetExternal,
                     },

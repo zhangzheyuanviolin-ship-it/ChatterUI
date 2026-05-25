@@ -1,6 +1,6 @@
-import { closeFd, getContentFd } from '@vali98/react-native-fs'
 import { Storage } from '@lib/enums/Storage'
 import { AppDirectory, fileExists, readableFileSize, writeBase64File } from '@lib/utils/File'
+import { closeFd, getContentFd } from '@vali98/react-native-fs'
 import {
     CompletionParams,
     ContextParams,
@@ -12,11 +12,11 @@ import { ModelDataType } from 'db/schema'
 import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
 
+import { checkGGMLDeprecated } from './GGML'
+import { KV, Model } from './Model'
 import { AppSettings } from '../../constants/GlobalValues'
 import { Logger } from '../../state/Logger'
 import { createMMKVStorage, mmkv } from '../../storage/MMKV'
-import { checkGGMLDeprecated } from './GGML'
-import { KV, Model } from './Model'
 
 export type CompletionTimings = {
     predicted_per_token_ms: number
@@ -87,6 +87,18 @@ const defaultConfig = {
     batch: 512,
     ctx_shift: true,
     devices: [],
+}
+
+const serializeError = (error: unknown) => {
+    if (error instanceof Error) {
+        return `${error.name}: ${error.message}${error.stack ? `\n${error.stack}` : ''}`
+    }
+    if (typeof error === 'string') return error
+    try {
+        return JSON.stringify(error)
+    } catch {
+        return String(error)
+    }
 }
 
 export namespace Llama {
@@ -182,7 +194,7 @@ export namespace Llama {
             }
 
             Logger.info(
-                `\n------ MODEL LOAD -----\n Model Name: ${model.name}\nStarting with parameters: \nContext Length: ${params.n_ctx}\nThreads: ${params.n_threads}\nBatch Size: ${params.n_batch}\nGPU Layers: ${params.n_gpu_layers}`
+                `\n------ MODEL LOAD -----\nModel Name: ${model.name}\nModel Path: ${modelPath}\nResolved From Content URI: ${closeModelPath}\nContext Length: ${params.n_ctx}\nThreads: ${params.n_threads}\nBatch Size: ${params.n_batch}\nGPU Layers: ${params.n_gpu_layers}\nContext Shift: ${params.ctx_shift}\nUse mmap: ${params.use_mmap}\nUse mlock: ${params.use_mlock}\nRequested Devices: ${params.devices?.length ? params.devices.join(', ') : '(auto)'}`
             )
 
             const progressCallback = (progress: number) => {
@@ -191,7 +203,9 @@ export namespace Llama {
 
             const llamaContext = await initLlama(params, progressCallback)
                 .catch((error) => {
-                    Logger.errorToast(`Could Not Load Model: ${error} `)
+                    const details = serializeError(error)
+                    Logger.error(`Could Not Load Model: ${details}`)
+                    Logger.errorToast(`Could Not Load Model: ${details}`)
                 })
                 .finally(async () => {
                     if (closeModelPath) {
@@ -202,6 +216,10 @@ export namespace Llama {
                 })
 
             if (!llamaContext) return
+
+            Logger.info(
+                `Model loaded successfully.\nAndroid Library: ${llamaContext.androidLib ?? 'unknown'}\nUsed Devices: ${llamaContext.devices?.join(', ') ?? 'none'}\nGPU Enabled: ${llamaContext.gpu}\nReason No GPU: ${llamaContext.reasonNoGPU ?? '(none)'}\nSystem Info: ${llamaContext.systemInfo ?? '(none)'}`
+            )
 
             set({
                 context: llamaContext,

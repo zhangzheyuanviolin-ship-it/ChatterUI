@@ -6,7 +6,7 @@ import { Instructs } from '@lib/state/Instructs'
 import { SamplersManager } from '@lib/state/SamplerState'
 import { useTTSStore } from '@lib/state/TTS'
 import { getThreads } from '@vali98/react-native-cpu-info'
-import { getBackendDevicesInfo } from 'cui-llama.rn'
+import { addNativeLogListener, getBackendDevicesInfo, toggleNativeLog } from 'cui-llama.rn'
 import { DeviceType, getDeviceTypeAsync } from 'expo-device'
 import {
     deleteAsync,
@@ -19,6 +19,9 @@ import { router } from 'expo-router'
 import { setBackgroundColorAsync as setUIBackgroundColor } from 'expo-system-ui'
 import { z } from 'zod'
 
+import { AppDirectory } from './File'
+import { patchAndroidText } from './PatchText'
+import { lockScreenOrientation } from './Screen'
 import { AppSettings, AppSettingsDefault, Global } from '../constants/GlobalValues'
 import { Llama } from '../engine/Local/LlamaLocal'
 import { Characters } from '../state/Characters'
@@ -26,9 +29,8 @@ import { Chats } from '../state/Chat'
 import { Logger } from '../state/Logger'
 import { mmkv } from '../storage/MMKV'
 import { Theme } from '../theme/ThemeManager'
-import { AppDirectory } from './File'
-import { patchAndroidText } from './PatchText'
-import { lockScreenOrientation } from './Screen'
+
+let nativeLoggingConfigured = false
 
 export const loadChatOnInit = async () => {
     if (!mmkv.getBoolean(AppSettings.ChatOnStartup)) return
@@ -59,13 +61,35 @@ const createDefaultCard = async () => {
 }
 
 const setCPUFeatures = async () => {
-    if (mmkv.getString(Global.CpuFeatures)) return
     try {
         const result = await getBackendDevicesInfo()
         mmkv.set(Global.CpuFeatures, JSON.stringify(result))
+        Logger.info(`Backend devices info: ${JSON.stringify(result)}`)
     } catch (e) {
         Logger.warn('Failed to get backend devices info: ' + e)
     }
+}
+
+const enableNativeBackendLogging = () => {
+    if (nativeLoggingConfigured) return
+    nativeLoggingConfigured = true
+
+    addNativeLogListener((level, text) => {
+        const message = text?.trim()
+        if (!message) return
+        const formatted = `[RNLlama/${level}] ${message}`
+        if (level === 'error') Logger.error(formatted)
+        else if (level === 'warn') Logger.warn(formatted)
+        else Logger.info(formatted)
+    })
+
+    toggleNativeLog(true)
+        .then(() => {
+            Logger.info('Native backend logging enabled')
+        })
+        .catch((e) => {
+            Logger.warn('Failed to enable native backend logging: ' + e)
+        })
 }
 
 const migrateModelData_0_7_10_to_0_8_0 = () => {
@@ -235,6 +259,8 @@ export const startupApp = () => {
 
     // Initialize the default card
     createDefaultCard()
+
+    enableNativeBackendLogging()
 
     // get fp16, i8mm and dotprod data
     setCPUFeatures()
